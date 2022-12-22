@@ -1,0 +1,16 @@
+.wrap {
+  position: relative;
+
+  &:hover {
+    button {
+      opacity: 1;
+    }
+  }
+  button {
+    opacity: 0;
+    transition: opacity 0.2s linear;
+    position: absolute;
+    top: 9px;
+    right: 8px;
+  }
+}

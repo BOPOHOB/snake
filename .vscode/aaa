@@ -1,0 +1,17 @@
+{
+  "cSpell.language": "ru,en",
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#09342E",
+    "titleBar.activeBackground": "#0D4840",
+    "titleBar.activeForeground": "#F0FCFB"
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "eslint.validate": ["javascript"],
+  "editor.tabSize": 2,
+  "cSpell.words": [
+    "antd",
+    "beamit"
+  ]
+}
