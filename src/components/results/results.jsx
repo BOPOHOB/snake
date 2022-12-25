@@ -5,6 +5,7 @@ import { BitScene } from 'elements/bitscene';
 
 import cn from './results.module.less';
 import { assets } from 'components/game/assets';
+import { Achivements } from 'components/achivements/achivements';
 
 const orderSelector = [
   {
@@ -123,6 +124,7 @@ const Results = ({ onResurect, onRestart, emoji }) => {
           <Button tabIndex={1} onClick={onRestart} autoFocus>Restart</Button>
           {currentObject.eatens.length >= 10 && <Button tabIndex={2} onClick={onResurect}>Resurect</Button>}
         </div>
+        <Achivements />
       </div>
     </div>
   );

@@ -106,7 +106,7 @@ class Achivements
 выиграть на третьем лабиринте или выше*/
   ];
 
-  onAchived?: () => {};
+  onAchived?: () => void;
 
   accept(eventType: AchivementType, context: any)
   {
