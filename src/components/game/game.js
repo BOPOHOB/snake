@@ -1,4 +1,5 @@
 import { assets } from './assets';
+import { achivements } from 'services/achivements';
 
 class Game {
   static fieldSize = [20, 9];
@@ -43,6 +44,7 @@ class Game {
   labyrinth;
   bug = 5;
   gameover = false;
+  isWin = false;
   onGameOver = [];
   retryCounter = 0;
 
@@ -58,6 +60,7 @@ class Game {
       apple: this.apple,
       bug: this.bug,
       retry: this.retryCounter,
+      isWin: this.isWin,
     };
   }
 
@@ -65,10 +68,10 @@ class Game {
     this.labyrinth = labyrinth ?? 1;
     this.lavel = lavel ?? 1;
     this.head = assets.labyrinthHeads[this.labyrinth];
-    this.apple = this.randomEmptyPoint();
+    this.allocateApple();
   }
 
-  *emptryFields() {
+  *emptyFields() {
     const result = new Set([...Game.fields()].filter((p) => !this.isLabyrinth(p)).map(Game.pointHash));
     // eslint-disable-next-line no-unused-vars
     for (const [_, point] of this.body()) {
@@ -86,14 +89,24 @@ class Game {
     }
   }
 
-  randomEmptyPoint() {
-    let result = [...this.emptryFields()];
-    return result[Math.floor(Math.random() * result.length)];
+  allocateApple() {
+    let result = [...this.emptyFields()];
+    if (result.length === 0) {
+      this.apple = null;
+      this.completeGame(true);
+      achivements.accept('win', this);
+      return;
+    }
+    this.apple = result[Math.floor(Math.random() * result.length)];
   }
 
   randomBugPosition() {
-    let empty = new Set([...this.emptryFields()].map(Game.pointHash));
+    let empty = new Set([...this.emptyFields()].map(Game.pointHash));
     let points = [...empty.values()].filter((v) => empty.has(v + 1));
+    if (points.length === 0) {
+      achivements.accept('no bug');
+      return null;
+    }
     const result = points[Math.floor(Math.random() * points.length)];
     return Game.hashPoint(result);
   }
@@ -206,6 +219,9 @@ class Game {
   }
 
   eatenPredict() {
+    if (this.apple === null) {
+      return false;
+    }
     const d = this.direction();
     const predictPos = Game.keepTorus([this.head[0] + d[0], this.head[1] + d[1]]);
     return Game.eqPoints(this.apple, predictPos) || this.isBug(predictPos);
@@ -215,6 +231,14 @@ class Game {
     return Game.tickDurations[this.lavel];
   }
 
+  completeGame(isWin) {
+    this.isWin = isWin;
+    this.gameover = true;
+    for (const callback of this.onGameOver) {
+      callback();
+    }
+  }
+
   tick() {
     if (this.gameover) {
       return;
@@ -222,26 +246,29 @@ class Game {
     const d = this.direction();
     const headCandidate = Game.keepTorus([this.head[0] + d[0], this.head[1] + d[1]]);
     if (this.isBody(headCandidate, 0) || this.isLabyrinth(headCandidate)) {
-      for (const callback of this.onGameOver) {
-        callback();
-      }
-      this.gameover = true;
+      this.completeGame(false);
       return;
     }
     this.head = headCandidate;
     ++this.tickId;
     if (Game.eqPoints(this.apple, this.head)) {
       this.eatens.add(this.tickId);
-      this.apple = this.randomEmptyPoint();
+      this.allocateApple();
       this.score += this.lavel + this.labyrinth;
+      achivements.accept('score', this);
       if (typeof this.bug === 'number') {
         --this.bug;
         if (this.bug === 0) {
-          this.bug = {
-            type: Math.floor(Math.random() * assets.bugs.length),
-            remind: Game.bugDuration,
-            pos: this.randomBugPosition(),
-          };
+          const pos = this.randomBugPosition();
+          if (pos === null) {
+            this.bug = 1;
+          } else {
+            this.bug = {
+              type: Math.floor(Math.random() * assets.bugs.length),
+              remind: Game.bugDuration,
+              pos,
+            };
+          }
         }
       }
     }

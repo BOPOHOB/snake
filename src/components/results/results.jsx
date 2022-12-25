@@ -40,9 +40,9 @@ const Row = ({ resultPos, lavels, currentObject }) => (
   </tr>
 );
 
-const Results = ({ onResurect, onRestart, current: currentStamp, emoji }) => {
+const Results = ({ onResurect, onRestart, emoji }) => {
   const results = JSON.parse(localStorage.getItem('stamp'));
-  const currentObject = results.find((v) => JSON.stringify(v) === JSON.stringify(currentStamp));
+  const currentObject = results[results.length - 1];
   const lavels = new Array(6).fill(null).map(() => []);
   for (const stamp of results) {
     const { eatens, labyrinth, score, lavel, retry } = stamp;
@@ -69,10 +69,9 @@ const Results = ({ onResurect, onRestart, current: currentStamp, emoji }) => {
   }
   console.assert(currentIdx >= 0);
   const maxPlayed = Math.max(...lavels.map((a) => a.length));
-  console.log(`Math.min(${maxPlayed}, Math.max(10, ${currentIdx} <= 12 ? ${currentIdx} : 0))`);
   return (
     <div className={cn.wrap}>
-      <h2>Game over</h2>
+      <h2>{currentObject.isWin ? 'Congratulation! You win!' : 'Game over'}</h2>
       <div>
         Order by:
         <Dropdown menu={{ items: orderSelector, onClick: onDropdownClick, selectedKeys: [orderBy] }} placement="bottom">
@@ -122,7 +121,7 @@ const Results = ({ onResurect, onRestart, current: currentStamp, emoji }) => {
         <Clipboard content={emoji.join('\n')}>Game frame copied to clipboard</Clipboard>
         <div className={cn.buttons}>
           <Button tabIndex={1} onClick={onRestart} autoFocus>Restart</Button>
-          {currentStamp.eatens.length >= 10 && <Button tabIndex={2} onClick={onResurect}>Resurect</Button>}
+          {currentObject.eatens.length >= 10 && <Button tabIndex={2} onClick={onResurect}>Resurect</Button>}
         </div>
       </div>
     </div>

@@ -192,7 +192,9 @@ function update({current: canvas }, frontend) {
   for (const ctxt of game.body()) {
     paintBodyFragment(ctxt);
   }
-  paintAsset(game.apple, assets.apple);
+  if (Array.isArray(game.apple)) {
+    paintAsset(game.apple, assets.apple);
+  } 
 
   if (typeof game.bug === 'object') {
     paintAsset([game.bug.pos[0], game.bug.pos[1]], assets.bugs[game.bug.type]);
