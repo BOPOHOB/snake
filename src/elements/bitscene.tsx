@@ -26,7 +26,7 @@ const BitScene: React.FC<{ size?: [number, number], width?: number, height?: num
         }
       }
     }
-  }, [data, size]);
+  }, [data, size, bg]);
   return <canvas width={width ?? 300} height={height ?? 300} ref={ref}></canvas>;
 };
 

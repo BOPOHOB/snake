@@ -1,0 +1,45 @@
+.wrap {
+  display: flex;
+  gap: 5px;
+  flex-direction: column;
+  padding: 0px;
+  margin: 0px;
+  
+  li {
+    display: grid;
+    grid-template-columns: 70px auto;
+    grid-template-rows: auto;
+    grid-template-areas: 
+      "icon header"
+      "icon text";
+      align-items: center;
+    list-style: none;
+    gap: 5px;
+    padding:5px;
+    margin: 0px;
+    opacity: 0.4;
+
+    canvas {
+      grid-area: icon;
+    }
+    h3 {
+      grid-area: header;
+    }
+    p {
+      grid-area: text;
+    }
+
+    h3, p {
+      padding: 0px;
+      margin: 0px;
+    }
+
+    &.resurrected {
+      background-color: white;
+    }
+
+    &.finished {
+      opacity: 1;
+    }
+  }
+}

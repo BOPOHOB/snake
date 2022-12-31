@@ -1,5 +1,6 @@
 import { Game } from './game';
 import { assets } from './assets';
+import { achivements } from 'services/achivements';
 
 class Frontend {
   game = null;
@@ -24,6 +25,7 @@ class Frontend {
 
   startGame() {
     this.game = new Game(this.lavel, this.labyrinth);
+    achivements.accept('started', this.game);
     this.game.onGameOver.push(() => {
       this.onGameOver.forEach((callback) => callback(this.game));
       clearInterval(this.interval);
