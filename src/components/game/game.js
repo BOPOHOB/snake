@@ -1,5 +1,5 @@
 import { assets } from './assets';
-import { achivements } from 'services/achivements';
+import { achievements } from 'services/achievements';
 
 class Game {
   static fieldSize = [20, 9];
@@ -59,7 +59,7 @@ class Game {
       labyrinth: this.labyrinth,
       apple: this.apple,
       bug: this.bug,
-      retry: this.retryCounter,
+      retryCounter: this.retryCounter,
       isWin: this.isWin,
     };
   }
@@ -94,7 +94,7 @@ class Game {
     if (result.length === 0) {
       this.apple = null;
       this.completeGame(true);
-      achivements.accept('win', this);
+      achievements.accept('win', this);
       return;
     }
     this.apple = result[Math.floor(Math.random() * result.length)];
@@ -104,7 +104,7 @@ class Game {
     let empty = new Set([...this.emptyFields()].map(Game.pointHash));
     let points = [...empty.values()].filter((v) => empty.has(v + 1));
     if (points.length === 0) {
-      achivements.accept('no bug');
+      achievements.accept('no bug');
       return null;
     }
     const result = points[Math.floor(Math.random() * points.length)];
@@ -255,7 +255,7 @@ class Game {
       this.eatens.add(this.tickId);
       this.allocateApple();
       this.score += this.level + this.labyrinth;
-      achivements.accept('score', this);
+      achievements.accept('score', this);
       if (typeof this.bug === 'number') {
         --this.bug;
         if (this.bug === 0) {

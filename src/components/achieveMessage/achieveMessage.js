@@ -3,9 +3,9 @@ import { message } from 'antd';
 
 import { BitScene } from 'elements/bitscene';
 
-import cn from './achiveMessage.module.less';
+import cn from './achieveMessage.module.less';
 
-const achiveMessage = (achive) => {
+const achieveMessage = (achive) => {
   message.open({
     icon: <BitScene bg={achive.isResurrected ? 'white' : undefined } data={achive.icon} width={70} height={70} />,
     content: (
@@ -18,4 +18,4 @@ const achiveMessage = (achive) => {
   });
 };
 
-export { achiveMessage };
+export { achieveMessage };

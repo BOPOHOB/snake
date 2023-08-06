@@ -1,11 +1,11 @@
 import React from 'react';
-import { achivements } from 'services/achivements';
+import { achievements } from 'services/achievements';
 import { BitScene } from 'elements/bitscene';
 import classNames from 'classnames';
 
-import cn from './achivements.module.less';
+import cn from './achievements.module.less';
 
-const Achivement = ({ achivement }) => {
+const Achievement = ({ achivement }) => {
   const resurrected = achivement.isResurrected && achivement.isFinished;
   return (
     <li className={classNames({ [cn.resurrected]: resurrected, [cn.finished]: achivement.isFinished })}>
@@ -16,10 +16,10 @@ const Achivement = ({ achivement }) => {
   );
 };
 
-const Achivements = () => (
+const Achievements = () => (
   <ul className={cn.wrap}>
-    { [...achivements.results()].map((achivement, id) => <Achivement key={id} achivement={achivement} />) }
+    { [...achievements.results()].map((achivement, id) => <Achievement key={id} achivement={achivement} />) }
   </ul>
 );
 
-export { Achivements };
+export { Achievements };

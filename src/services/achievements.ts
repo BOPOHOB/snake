@@ -1,8 +1,8 @@
 import { assets } from 'components/game/assets';
 
-type AchivementType = 'finished' | 'score' | 'no bug' | 'win' | 'ate bug' | 'started';
+type AchievementType = 'finished' | 'score' | 'no bug' | 'win' | 'ate bug' | 'started';
 
-abstract class Achivement {
+abstract class Achievement {
   isFinished: boolean = false;
   isResurrected: boolean = false;
   abstract name: string;
@@ -13,13 +13,13 @@ abstract class Achivement {
   finish():void {
     this.accept = () => {};
     this.isFinished = true;
-    achivements?.onAchived?.(this);
+    achievements?.onAchieved?.(this);
   };
 
-  abstract accept(type: AchivementType, context: any): void;
+  abstract accept(type: AchievementType, context: any): void;
 }
 
-class DemoAchive extends Achivement {
+class DemoAchieve extends Achievement {
   name = 'Explorer';
   details = 'Visit all labyrinths';
 
@@ -40,7 +40,7 @@ class DemoAchive extends Achivement {
 
   state: Array<boolean> = new Array(assets.labyrinth.length).fill(false);
   
-  accept(type: AchivementType, game: any) {
+  accept(type: AchievementType, game: any) {
     switch (type) {
     case 'finished':
     case 'started':
@@ -56,7 +56,7 @@ class DemoAchive extends Achivement {
   }
 }
 
-class ScoreThousand extends Achivement {
+class ScoreThousand extends Achievement {
   name = '1000';
   details = 'Collect 1000 points in any game';
 
@@ -68,7 +68,7 @@ class ScoreThousand extends Achivement {
     [0,0,1,0,0],
   ];
   
-  accept(type: AchivementType, game: any) {
+  accept(type: AchievementType, game: any) {
     switch (type) {
     case 'finished':
     case 'score':
@@ -82,7 +82,7 @@ class ScoreThousand extends Achivement {
   }
 }
 
-class ScoreThousandForAll extends Achivement {
+class ScoreThousandForAll extends Achievement {
   name = '1000 for all';
   details = 'Collect 1000 points in each labyrinth';
   progressComplete = 6;
@@ -101,7 +101,7 @@ class ScoreThousandForAll extends Achivement {
 
   state: Array<boolean> = new Array(assets.labyrinth.length).fill(false);
 
-  accept(type: AchivementType, game: any) {
+  accept(type: AchievementType, game: any) {
     switch (type) {
     case 'finished':
     case 'score':
@@ -119,12 +119,12 @@ class ScoreThousandForAll extends Achivement {
   }
 }
 
-class Achivements
+class Achievements
 {
-  achivements: Achivement[] = [];
-  resurrected: Achivement[] = [];
+  achievements: Achievement[] = [];
+  resurrected: Achievement[] = [];
 
-  ahivements = [
+  zzzzzz = [
     /*
 сыграть во всех лабиринтах
 съесть пять букашек подряд
@@ -151,24 +151,25 @@ class Achivements
 выиграть на третьем лабиринте или выше*/
   ];
 
-  onAchived?: (a: Achivement) => void;
+  onAchieved?: (a: Achievement) => void;
 
-  accept(eventType: AchivementType, context: any)
+  accept(eventType: AchievementType, context: any)
   {
     if (context.retryCounter === 0) {
-      for (const achivement of this.achivements) {
-        achivement.accept(eventType, context);
+      for (const achievement of this.achievements) {
+        achievement.accept(eventType, context);
       }
     }
-    for (const achivement of this.resurrected) {
-      achivement.accept(eventType, context);
+    for (const achievement of this.resurrected) {
+      achievement.accept(eventType, context);
     }
   }
 
   *results() {
-    for (let i = 0; i < this.achivements.length; ++i) {
-      if (this.achivements[i].isFinished) {
-        yield this.achivements[i];
+    for (let i = 0; i < this.achievements.length; ++i) {
+      console.log(this.achievements[i].name, this.achievements[i].isFinished, this.resurrected[i].isFinished);
+      if (this.achievements[i].isFinished) {
+        yield this.achievements[i];
       } else {
         yield this.resurrected[i];
       }
@@ -176,13 +177,13 @@ class Achivements
   }
 
   constructor() {
-    for (const achivements of [this.achivements, this.resurrected]) {
-      achivements.push(new ScoreThousand());
-      achivements.push(new ScoreThousandForAll());
-      achivements.push(new DemoAchive());
+    for (const achievements of [this.achievements, this.resurrected]) {
+      achievements.push(new ScoreThousand());
+      achievements.push(new ScoreThousandForAll());
+      achievements.push(new DemoAchieve());
     }
-    for (const achivement of this.resurrected) {
-      achivement.isResurrected = true;
+    for (const achievement of this.resurrected) {
+      achievement.isResurrected = true;
     }
     for (const stamp of JSON.parse(localStorage.getItem('stamp') ?? '[]')) {
       this.accept('finished', stamp);
@@ -190,6 +191,6 @@ class Achivements
   }
 }
 
-var achivements = new Achivements();
+var achievements = new Achievements();
 
-export { achivements };
+export { achievements };

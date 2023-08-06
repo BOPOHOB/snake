@@ -5,11 +5,11 @@ import isMobile from 'is-mobile';
 
 import { Game } from 'pages/game.jsx';
 import { Page404 } from 'pages/404.jsx';
-import { achivements } from 'services/achivements';
-import { achiveMessage } from 'components/achiveMessage/achiveMessage';
+import { achievements } from 'services/achievements';
+import { achieveMessage } from 'components/achieveMessage/achieveMessage';
 
 export const Router = () => {
-  achivements.onAchived = achiveMessage;
+  achievements.onAchieved = achieveMessage;
   if (isMobile()) {
     return (
       <div style={{display: 'flex', justifyContent: 'center', flexDirection: 'column', alignItems: 'center'}}>
