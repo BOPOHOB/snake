@@ -4,27 +4,27 @@ import { achivements } from 'services/achivements';
 
 class Frontend {
   game = null;
-  lavel;
+  level;
   labyrinth = 1;
-  page = 'lavel';
+  page = 'level';
   interval;
   demoHead = [13, 6];
   unpausing = 0;
   update;
   onGameOver = [];
 
-  setLavel(value) {
-    this.lavel = value;
+  setLevel(value) {
+    this.level = value;
     clearInterval(this.interval);
     this.interval = setInterval(() => {
       this.demoHead[0] += 1;
       Game.keepTorus(this.demoHead);
       this.update();
-    }, Game.tickDurations[this.lavel]);
+    }, Game.tickDurations[this.level]);
   }
 
   startGame() {
-    this.game = new Game(this.lavel, this.labyrinth);
+    this.game = new Game(this.level, this.labyrinth);
     achivements.accept('started', this.game);
     this.game.onGameOver.push(() => {
       this.onGameOver.forEach((callback) => callback(this.game));
@@ -35,7 +35,7 @@ class Frontend {
 
   onNextPage() {
     switch (this.page) {
-    case 'lavel':
+    case 'level':
       clearInterval(this.interval);
       this.page = 'labyrinth';
       this.update();
@@ -84,8 +84,8 @@ class Frontend {
   onBackPage() {
     switch (this.page) {
     case 'labyrinth':
-      this.page = 'lavel';
-      this.setLavel(this.lavel);
+      this.page = 'level';
+      this.setLevel(this.level);
       this.update();
       return;
     default: return;
@@ -94,9 +94,9 @@ class Frontend {
   
   onUp() {
     switch(this.page) {
-    case 'lavel':
-      if (this.lavel < Game.tickDurations.length - 1) {
-        this.setLavel(this.lavel + 1);
+    case 'level':
+      if (this.level < Game.tickDurations.length - 1) {
+        this.setLevel(this.level + 1);
       }
       this.update();
       return;
@@ -116,9 +116,9 @@ class Frontend {
 
   onDown() {
     switch(this.page) {
-    case 'lavel':
-      if (this.lavel > 1) {
-        this.setLavel(this.lavel - 1);
+    case 'level':
+      if (this.level > 1) {
+        this.setLevel(this.level - 1);
       }
       this.update();
       return;
@@ -138,9 +138,9 @@ class Frontend {
 
   onLeft() {
     switch(this.page) {
-    case 'lavel':
-      if (this.lavel > 1) {
-        this.setLavel(this.lavel - 1);
+    case 'level':
+      if (this.level > 1) {
+        this.setLevel(this.level - 1);
       }
       this.update();
       return;
@@ -160,9 +160,9 @@ class Frontend {
 
   onRight() {
     switch(this.page) {
-    case 'lavel':
-      if (this.lavel < Game.tickDurations.length - 1) {
-        this.setLavel(this.lavel + 1);
+    case 'level':
+      if (this.level < Game.tickDurations.length - 1) {
+        this.setLevel(this.level + 1);
       }
       this.update();
       return;

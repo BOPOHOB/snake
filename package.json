@@ -29,7 +29,8 @@
   },
   "scripts": {
     "start": "cross-env PORT=3000 craco start",
-    "build": "craco build"
+    "build": "craco build",
+    "deploy": "craco build && scp -r build bopohob@bopohob.ru:/var/www/snake"
   },
   "eslintConfig": {
     "extends": [

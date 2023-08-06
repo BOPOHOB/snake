@@ -101,13 +101,13 @@ function update({current: canvas }, frontend) {
     ctx.fillRect(1, 1, fieldSize[0] * 4 + borderWidth, 1);
     ctx.fillRect(1, -1, fieldSize[0] * 4 + borderWidth + 1, 1);
     ctx.translate(borderWidth, borderWidth);
-    if (frontend.page === 'lavel') {
+    if (frontend.page === 'level') {
       ctx.translate(0, 4);
       ctx.save();
       ctx.translate(paintRect[0] / 2.0, 0);
       ctx.scale(4,4);
-      paintAsset([-1,0], assets.numbers[Math.floor(frontend.lavel / 10)]);
-      paintAsset([0,0], assets.numbers[frontend.lavel - 10 * Math.floor(frontend.lavel / 10)]);
+      paintAsset([-1,0], assets.numbers[Math.floor(frontend.level / 10)]);
+      paintAsset([0,0], assets.numbers[frontend.level - 10 * Math.floor(frontend.level / 10)]);
       ctx.restore();
       const demoLength = 9;
       for (let i = 0; i !== demoLength; ++i) {

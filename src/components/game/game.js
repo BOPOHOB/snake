@@ -40,7 +40,7 @@ class Game {
   eatens = new Set(new Array(7).fill(null).map((_, id) => -100 - id));
   tickId = 0;
   apple;
-  lavel;
+  level;
   labyrinth;
   bug = 5;
   gameover = false;
@@ -55,7 +55,7 @@ class Game {
       head: this.head,
       eatens: [...this.eatens],
       tickId: this.tickId,
-      lavel: this.lavel,
+      level: this.level,
       labyrinth: this.labyrinth,
       apple: this.apple,
       bug: this.bug,
@@ -64,9 +64,9 @@ class Game {
     };
   }
 
-  constructor(lavel, labyrinth) {
+  constructor(level, labyrinth) {
     this.labyrinth = labyrinth ?? 1;
-    this.lavel = lavel ?? 1;
+    this.level = level ?? 1;
     this.head = assets.labyrinthHeads[this.labyrinth];
     this.allocateApple();
   }
@@ -228,7 +228,7 @@ class Game {
   }
 
   tickDuration() {
-    return Game.tickDurations[this.lavel];
+    return Game.tickDurations[this.level];
   }
 
   completeGame(isWin) {
@@ -254,7 +254,7 @@ class Game {
     if (Game.eqPoints(this.apple, this.head)) {
       this.eatens.add(this.tickId);
       this.allocateApple();
-      this.score += this.lavel + this.labyrinth;
+      this.score += this.level + this.labyrinth;
       achivements.accept('score', this);
       if (typeof this.bug === 'number') {
         --this.bug;
@@ -275,7 +275,7 @@ class Game {
     if (typeof this.bug === 'object') {
       if (this.isBug(this.head)) {
         this.eatens.add(this.tickId);
-        this.score += (this.lavel + this.labyrinth) * (10 + this.bug.remind);
+        this.score += (this.level + this.labyrinth) * (10 + this.bug.remind);
         this.bug = Game.bugFrequency;
       } else {
         --this.bug.remind;
