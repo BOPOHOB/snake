@@ -52,7 +52,7 @@ class Game extends React.Component
   }
 
   componentDidMount() {
-    this.frontend.setLevel(3);
+    this.frontend.setLevel(parseInt(localStorage.getItem('level') ?? 3));
   }
 
   render() {
@@ -69,7 +69,7 @@ class Game extends React.Component
 
   onRestart = () => {
     this.frontend = new Frontend();
-    this.frontend.setLevel(3);
+    this.frontend.setLevel(parseInt(localStorage.getItem('level') ?? 3));
     this.frontend.onGameOver = [ this.onGameOver ];
     this.forceUpdate();
   };

@@ -6,7 +6,7 @@ class Game {
   static defaultDirection = [1, 0];
   static bugFrequency = 5;
   static bugDuration = 20;
-  static tickDurations = [10000, 1000, 500, 350, 250, 150, 100, 75, 60, 45, 35, 30, 25, 20, 15, 13];
+  static tickDurations = [10000, 1000, 500, 350, 310, 280, 250, 225, 200, 175, 150, 130, 110, 100, 80, 65];
   static eqPoints = ([x1, y1], [x2, y2]) => x1 === x2 && y1 === y2;
   static *fields() {
     for (let row = 0; row < Game.fieldSize[1]; ++row) {
@@ -254,7 +254,7 @@ class Game {
     if (Game.eqPoints(this.apple, this.head)) {
       this.eatens.add(this.tickId);
       this.allocateApple();
-      this.score += this.level + this.labyrinth;
+      this.score += this.level + (this.labyrinth * 3);
       achievements.accept('score', this);
       if (typeof this.bug === 'number') {
         --this.bug;
@@ -275,7 +275,7 @@ class Game {
     if (typeof this.bug === 'object') {
       if (this.isBug(this.head)) {
         this.eatens.add(this.tickId);
-        this.score += (this.level + this.labyrinth) * (10 + this.bug.remind);
+        this.score += (this.level + (this.labyrinth * 3)) * (10 + this.bug.remind);
         this.bug = Game.bugFrequency;
       } else {
         --this.bug.remind;

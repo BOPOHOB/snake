@@ -5,7 +5,7 @@ import { achievements } from 'services/achievements';
 class Frontend {
   game = null;
   level;
-  labyrinth = 1;
+  labyrinth = parseInt(localStorage.getItem('labyrinth') ?? 1, 10);
   page = 'level';
   interval;
   demoHead = [13, 6];
@@ -15,6 +15,7 @@ class Frontend {
 
   setLevel(value) {
     this.level = value;
+    localStorage.setItem('level', value);
     clearInterval(this.interval);
     this.interval = setInterval(() => {
       this.demoHead[0] += 1;
@@ -103,6 +104,7 @@ class Frontend {
     case 'labyrinth':
       if (this.labyrinth > 2) {
         this.labyrinth -= 3;
+        localStorage.setItem('labyrinth', this.labyrinth);
       }
       this.update();
       return;
@@ -125,6 +127,7 @@ class Frontend {
     case 'labyrinth':
       if (this.labyrinth < assets.labyrinth.length - 3) {
         this.labyrinth += 3;
+        localStorage.setItem('labyrinth', this.labyrinth);
       }
       this.update();
       return;
@@ -147,6 +150,7 @@ class Frontend {
     case 'labyrinth':
       if (this.labyrinth > 0) {
         this.labyrinth -= 1;
+        localStorage.setItem('labyrinth', this.labyrinth);
       }
       this.update();
       return;
@@ -169,6 +173,7 @@ class Frontend {
     case 'labyrinth':
       if (this.labyrinth < assets.labyrinth.length - 1) {
         this.labyrinth += 1;
+        localStorage.setItem('labyrinth', this.labyrinth);
       }
       this.update();
       return;
