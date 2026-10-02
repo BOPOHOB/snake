@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Button, Dropdown } from 'antd';
-import { Clipboard } from 'elements/clipboard/clipboard';
 import { BitScene } from 'elements/bitscene';
 
 import cn from './results.module.less';
 import { assets } from 'components/game/assets';
 import { Achievements } from 'components/achievements/achievements';
+import { MiniField } from './miniField';
 
 const orderSelector = [
   {
@@ -41,7 +41,7 @@ const Row = ({ resultPos, levels, currentObject }) => (
   </tr>
 );
 
-const Results = ({ onResurect, onRestart, emoji }) => {
+const Results = ({ frontend, onResurect, onRestart }) => {
   const results = JSON.parse(localStorage.getItem('stamp'));
   const currentObject = results[results.length - 1];
   const levels = new Array(6).fill(null).map(() => []);
@@ -119,7 +119,7 @@ const Results = ({ onResurect, onRestart, emoji }) => {
         </tbody>
       </table>
       <div className={cn.other}>
-        <Clipboard content={emoji.join('\n')}>Game frame copied to clipboard</Clipboard>
+        <MiniField frontend={frontend} />
         <div className={cn.buttons}>
           <Button tabIndex={1} onClick={onRestart} autoFocus>Restart</Button>
           {currentObject.eatens.length >= 10 && <Button tabIndex={2} onClick={onResurect}>Resurect</Button>}

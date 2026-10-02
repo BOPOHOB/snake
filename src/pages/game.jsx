@@ -3,7 +3,6 @@ import React from 'react';
 import { Game as Gameplay } from 'components/game';
 import { Results } from 'components/results/results';
 import { Frontend } from 'components/game/frontend';
-import { Game as GameLogic } from 'components/game/game';
 
 const storageStampKey = 'stamp';
 
@@ -11,7 +10,6 @@ class Game extends React.Component
 {
   frontend = new Frontend();
   lastGame = null;
-  stampText = [];
 
   constructor(props) {
     super(props);
@@ -24,32 +22,8 @@ class Game extends React.Component
     const lader = [...JSON.parse(localStorage.getItem(storageStampKey)) ?? [], this.lastGame];
     localStorage.setItem(storageStampKey, JSON.stringify(lader));
 
-    this.updateStampText();
-
     this.forceUpdate();
   };
-
-  updateStampText() {
-    this.stampText = [];
-    for (let row = 0; row !== GameLogic.fieldSize[0]; ++row) {
-      let r = '';
-      for (let col = 0; col !== GameLogic.fieldSize[1]; ++col) {
-        const point = [row, col];
-        if (Array.isArray(this.frontend.game.apple) && GameLogic.eqPoints(this.frontend.game.apple, point)) {
-          r += '🍏';
-        } else if (this.frontend.game.isBug(point)) {
-          r += '🐞';
-        } else if (this.frontend.game.isLabyrinth(point)) {
-          r += '⏹';
-        } else if (this.frontend.game.isBody(point)) {
-          r += '🔷';
-        } else {
-          r += '⚪️';
-        }
-      }
-      this.stampText.push(r);
-    }
-  }
 
   componentDidMount() {
     this.frontend.setLevel(parseInt(localStorage.getItem('level') ?? 3));
@@ -57,7 +31,7 @@ class Game extends React.Component
 
   render() {
     if (this.frontend.game?.gameover) {
-      return <Results onResurect={this.onResurect} onRestart={this.onRestart} current={this.lastGame} emoji={this.stampText} />;
+      return <Results frontend={this.frontend} onResurect={this.onResurect} onRestart={this.onRestart} current={this.lastGame} />;
     } else {
       return <Gameplay frontend={this.frontend} />;
     }
