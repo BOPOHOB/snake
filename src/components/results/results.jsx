@@ -6,6 +6,7 @@ import cn from './results.module.less';
 import { assets } from 'components/game/assets';
 import { Achievements } from 'components/achievements/achievements';
 import { MiniField } from './miniField';
+import type { AppUser, Vendor } from 'services/api';
 
 const orderSelector = [
   {
@@ -41,7 +42,29 @@ const Row = ({ resultPos, levels, currentObject }) => (
   </tr>
 );
 
-const Results = ({ frontend, onResurect, onRestart }) => {
+const AuthPanel = ({ user, onLogin, onLogout }: {
+  user: AppUser | null;
+  onLogin: (v: Vendor) => void;
+  onLogout: () => void;
+}) => {
+  if (user) {
+    return (
+      <div className={cn.auth}>
+        <span className={cn.userName}>{user.name}</span>
+        <Button onClick={onLogout}>Logout</Button>
+      </div>
+    );
+  }
+  return (
+    <div className={cn.auth}>
+      <span className={cn.authHint}>Login to submit your result:</span>
+      <Button onClick={() => onLogin('yandex')} className={cn.loginBtn}>Yandex</Button>
+      <Button onClick={() => onLogin('google')} className={cn.loginBtn}>Google</Button>
+    </div>
+  );
+};
+
+const Results = ({ frontend, user, onLogin, onLogout, onResurect, onRestart }) => {
   const results = JSON.parse(localStorage.getItem('stamp'));
   const currentObject = results[results.length - 1];
   const levels = new Array(6).fill(null).map(() => []);
@@ -73,6 +96,7 @@ const Results = ({ frontend, onResurect, onRestart }) => {
   return (
     <div className={cn.wrap}>
       <h2>{currentObject.isWin ? 'Congratulation! You win!' : 'Game over'}</h2>
+      <AuthPanel user={user} onLogin={onLogin} onLogout={onLogout} />
       <div>
         Order by:
         <Dropdown menu={{ items: orderSelector, onClick: onDropdownClick, selectedKeys: [orderBy] }} placement="bottom">

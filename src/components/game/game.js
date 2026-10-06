@@ -188,12 +188,12 @@ class Game {
     this.retryCounter += 1;
   }
 
-  directinOfLastStep() {
-    return this.bands[this.bands.length - 1]?.direction ?? Game.defaultDirection;
+  directionOfLastStep() {
+    return this.bands.at(-1)?.direction ?? Game.defaultDirection;
   }
 
   band(direction) {
-    if (Game.eqPoints(this.directinOfLastStep(), [-direction[0], -direction[1]])) {
+    if (Game.eqPoints(this.directionOfLastStep(), [-direction[0], -direction[1]])) {
       return;
     }
     this.bands.push({
