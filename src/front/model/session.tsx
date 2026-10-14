@@ -1,8 +1,9 @@
-import { createContext, useContext, useSyncExternalStore } from 'react';
+import { createContext, useContext, useSyncExternalStore, type FC, type PropsWithChildren } from 'react';
 import type { AppUser } from '../types/user';
 import type { Vendor } from '../types/vendor';
 import { authLogout, authMe } from '../services/api';
 import { startLogin } from '../services/auth';
+import { useModel } from '../utils/useModel';
 
 type SessionSnapshot = {
   user: AppUser | null;
@@ -88,7 +89,10 @@ class Session {
 }
 
 const SessionContext = createContext<Session | null>(null);
-const SessionProvider = SessionContext.Provider;
+const SessionProvider: FC<PropsWithChildren> = ({children}) => {
+  const session = useModel(() => new Session(), []);
+  return <SessionContext.Provider value={session}>{children}</SessionContext.Provider>;
+}
 
 function useSession(): Session {
   const ctx = useContext(SessionContext);

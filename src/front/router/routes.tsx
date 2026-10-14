@@ -75,8 +75,8 @@ const routes: RouteObject[] = [
         loader: (args) => loadResults(args),
         handle: {
           meta: {
-            title: 'Таблица лидеров — Nokia 3310 Snake 2',
-            description: 'Лучшие результаты игры.',
+            title: 'Таблица рекордов — Nokia 3310 Snake 2',
+            description: 'Авторизуйтесь, чтобы добавить свои результаты в общую таблицу',
           } satisfies RouteMeta,
         },
       },

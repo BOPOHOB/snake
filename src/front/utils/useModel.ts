@@ -12,7 +12,7 @@ function useModel<T extends Disposable>(
   const [model, setModel] = useState(creator);
 
   useEffect(() => {
-    if (deps.length === 0) {
+    if (deps.length !== 0) {
       return () => {
         model.destructor?.();
       };

@@ -1,6 +1,7 @@
-import { createContext, useContext, useSyncExternalStore } from 'react';
+import { createContext, useContext, useSyncExternalStore, type FC, type PropsWithChildren } from 'react';
 import type { Stamp } from '../types/stamp';
 import { addResult } from '../services/api';
+import { useModel } from '../utils/useModel';
 
 const STORAGE_KEY = 'stamp';
 
@@ -119,7 +120,10 @@ class Stamps {
 }
 
 const StampsContext = createContext<Stamps | null>(null);
-const StampsProvider = StampsContext.Provider;
+const StampsProvider: FC<PropsWithChildren> = ({ children }) => {
+  const stamps = useModel(() => new Stamps(), []);
+  return <StampsContext.Provider value={stamps}>{ children }</StampsContext.Provider>;
+}
 
 function useStamps(): Stamps {
   const ctx = useContext(StampsContext);

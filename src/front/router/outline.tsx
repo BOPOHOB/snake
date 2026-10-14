@@ -5,12 +5,14 @@ import type { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import { useCallback, useMemo, type FC, type PropsWithChildren } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 
+import cn from './outline.module.less';
+
 type MenuItem = Required<MenuProps>['items'][number];
 
 const ITEMS: MenuItem[] = [
   {
     label: 'Game',
-    key: 'play',
+    key: '',
   },
   {
     label: 'Results',
@@ -23,15 +25,12 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
   const { pathname } = useLocation();
   const onClick: MenuClickEventHandler = useCallback(({ key }) => { navigate(`/${key}`); }, []);
   const selectedKeys = useMemo(() => {
-    if (pathname === '/' || pathname.startsWith('/play')) return ['play'];
-    if (pathname.startsWith('/leaderboard') || pathname.startsWith('/result')) {
-      return ['leaderboard'];
-    }
-    return [];
+    if (pathname === '/') return [''];
+    return ['leaderboard'];
   }, [pathname]);
   return (
-    <main style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>
-      <header>
+    <main>
+      <header className={cn.header}>
         <h1>Nokia 3310 Snake 2</h1>
         <nav>
           <Menu onClick={onClick} selectedKeys={selectedKeys} mode="horizontal" items={ITEMS} />

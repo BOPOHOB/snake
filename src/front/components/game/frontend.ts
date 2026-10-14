@@ -12,7 +12,7 @@ class Frontend {
   demoHead: Point = [13, 6];
   unpausing = 0;
   update?: () => void;
-  onGameOver: Array<(game: Game) => void> = [];
+  #onGameOver: Array<(game: Game) => void> = [];
 
   constructor() {
     if (typeof localStorage !== 'undefined') {
@@ -40,10 +40,15 @@ class Frontend {
     this.game.onAchievement = (type, g) => achievements.accept(type, g);
     achievements.accept('started', this.game);
     this.game.onGameOver.push(() => {
-      this.onGameOver.forEach((callback) => callback(this.game!));
+      console.log('frontend game over', this.#onGameOver)
+      this.#onGameOver.forEach((callback) => callback(this.game!));
       if (this.interval) clearInterval(this.interval);
     });
     this.onResume(0);
+  }
+
+  onGameOver(callback: (game: Game) => void): void {
+    this.#onGameOver.push(callback);
   }
 
   onNextPage(): void {

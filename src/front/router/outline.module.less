@@ -1,0 +1,36 @@
+.header {
+  display: flex;
+  width: 100vw;
+  height: 50px;
+  align-items: center;
+  gap: 50px;
+  h1 {
+    margin: 0px;
+    margin-left: 40px;
+  }
+  nav {
+    margin-top: 6px;
+    :global(.ant-menu-light) {
+      background-color: transparent;
+      font-family: 'nokia';
+      font-size: 24px;
+      
+
+      :global(.ant-menu-item-selected),
+      :global(.ant-menu-item-active) {
+        color: inherit;
+  
+        &::after {
+          border-bottom-color: black;
+          border-width: 4px;
+        }
+
+        &:hover::after {
+
+          border-bottom-width: 6px;
+          border-bottom-color: black;
+        }
+      }
+    }
+  }
+}

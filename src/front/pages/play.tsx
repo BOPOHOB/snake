@@ -1,28 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Frontend } from '../components/game/frontend';
 import { GameCanvas } from '../components/game/index';
-import { Results } from '../components/results/Results';
 import { restoreGameFromStamp } from '../components/game/restore';
 import { useStamps } from '../model/stamps';
 import { useSession } from '../model/session';
 import { handleOAuthCallback } from '../services/auth';
+import { useNavigate } from 'react-router-dom';
 
 export const Play = () => {
-  const [frontend, setFrontend] = useState(() => new Frontend());
-  const [showResults, setShowResults] = useState(false);
+  const frontend = useMemo(() => new Frontend(), []);
   const stamps = useStamps();
   const session = useSession();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Семантика старого pages/game.jsx: уровень по умолчанию = 3.
     frontend.setLevel(Number(localStorage.getItem('level') ?? 3));
 
-    frontend.onGameOver = [
-      (game) => {
-        stamps.add(game.stamp());
-        setShowResults(true);
-      },
-    ];
+    frontend.onGameOver((game) => {
+      stamps.add(game.stamp());
+      navigate('/leaderboard');
+    });
 
     // Возврат с OAuth: ?code=&state= в URL.
     void (async () => {
@@ -36,34 +34,10 @@ export const Play = () => {
         if (callback.ok) {
           session.setUser(callback.user, false);
         }
-        setShowResults(true);
+        navigate('leaderboard');
       }
     })();
   }, [frontend, stamps, session]);
-
-  if (showResults) {
-    return (
-      <Results
-        onRestart={() => {
-          const f = new Frontend();
-          f.setLevel(Number(localStorage.getItem('level') ?? 3));
-          f.onGameOver = [
-            (game) => {
-              stamps.add(game.stamp());
-              setShowResults(true);
-            },
-          ];
-          setFrontend(f);
-          setShowResults(false);
-        }}
-        onResurrect={() => {
-          frontend.game?.retry(10);
-          setShowResults(false);
-          frontend.onResume();
-        }}
-      />
-    );
-  }
 
   return <GameCanvas frontend={frontend} />;
 };
