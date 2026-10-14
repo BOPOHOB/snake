@@ -3,17 +3,18 @@ import { useEffect } from 'react';
 import { ConfigProvider } from 'antd';
 import ruRU from 'antd/locale/ru_RU';
 import { SessionProvider, useSessionState } from './model/session';
-import { StampsProvider, useStamps } from './model/stamps';
+import { StampsProvider, useStamps, useStampsState } from './model/stamps';
 import { achievements } from './services/achievements';
 import { achieveMessage } from './components/achieveMessage/achieveMessage';
 
-/** Связывает sync-очередь stamps с состоянием авторизации. */
+/** Связывает sync-очередь stamps с состоянием авторизации и появлением unsent. */
 function StampsSync() {
   const stamps = useStamps();
   const { isAuthenticated } = useSessionState();
+  const { unsent } = useStampsState();
   useEffect(() => {
     void stamps.sync(isAuthenticated);
-  }, [stamps, isAuthenticated]);
+  }, [stamps, isAuthenticated, unsent]);
   return null;
 }
 

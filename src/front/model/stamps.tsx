@@ -1,5 +1,6 @@
 import { createContext, useContext, useSyncExternalStore, type FC, type PropsWithChildren } from 'react';
 import type { Stamp } from '../types/stamp';
+import type { PositionResponse } from '../types/position';
 import { addResult } from '../services/api';
 import { useModel } from '../utils/useModel';
 
@@ -9,6 +10,8 @@ export type StampEntry = {
   stamp: Stamp;
   sent: boolean;
   resultId?: number;
+  /** Ответ сервера при успешной отправке — чтобы UI не мигал при переходе на /result/:id. */
+  position?: PositionResponse;
 };
 
 type StampsSnapshot = {
@@ -77,6 +80,10 @@ class Stamps {
     return this.#entries.at(-1)?.stamp ?? null;
   }
 
+  lastEntry(): StampEntry | null {
+    return this.#entries.at(-1) ?? null;
+  }
+
   unsentCount(): number {
     return this.#entries.filter((e) => !e.sent).length;
   }
@@ -109,6 +116,15 @@ class Stamps {
         });
         entry.sent = true;
         entry.resultId = res.id;
+        entry.position = {
+          level: res.level,
+          labyrinth: res.labyrinth,
+          score: res.score,
+          position: res.position,
+          total: res.total,
+          before: res.before,
+          after: res.after,
+        };
       } catch {
         // Не отправлено — оставим в очереди, попробуем при следующем sync.
       }
@@ -122,8 +138,8 @@ class Stamps {
 const StampsContext = createContext<Stamps | null>(null);
 const StampsProvider: FC<PropsWithChildren> = ({ children }) => {
   const stamps = useModel(() => new Stamps(), []);
-  return <StampsContext.Provider value={stamps}>{ children }</StampsContext.Provider>;
-}
+  return <StampsContext.Provider value={stamps}>{children}</StampsContext.Provider>;
+};
 
 function useStamps(): Stamps {
   const ctx = useContext(StampsContext);

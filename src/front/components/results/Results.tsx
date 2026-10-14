@@ -1,35 +1,35 @@
-import { Fragment, useState } from 'react';
-import { Button, Dropdown } from 'antd';
+import { Fragment, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { BitScene } from '../elements/BitScene';
-import { Achievements } from '../achievements/Achievements';
-import { MiniField } from './MiniField';
 import { assets } from '../game/assets';
-import { useStamps } from '../../model/stamps';
-import { useSession, useSessionState } from '../../model/session';
-import type { Stamp } from '../../types/stamp';
+import type { ResultDump } from '../../types/result';
 import cn from './results.module.less';
+
+const LABYRINTH_COUNT = assets.labyrinth.length;
 
 const orderSelector = [
   { key: 'score', label: 'Score' },
   { key: 'length', label: 'Length' },
-];
+] as const;
 
-type LevelEntry = {
+type OrderKey = (typeof orderSelector)[number]['key'];
+
+type Entry = {
   length: number;
   score: number;
   level: number;
   retry: number;
-  stamp: Stamp;
+  result: ResultDump;
 };
 
 const Row = ({
   resultPos,
   levels,
-  currentObject,
+  selectedId,
 }: {
   resultPos: number;
-  levels: LevelEntry[][];
-  currentObject: Stamp;
+  levels: Entry[][];
+  selectedId?: number;
 }) => (
   <tr>
     <td>{resultPos + 1}</td>
@@ -37,107 +37,75 @@ const Row = ({
       if (lvl.length <= resultPos) {
         return <td className={cn.empty} colSpan={4} key={labyrinth} />;
       }
-      const { length, score, level, retry, stamp } = lvl[resultPos];
-      const cnn = currentObject === stamp ? cn.current : '';
+      const { length, score, level, retry, result } = lvl[resultPos];
+      const current = selectedId === result.id ? cn.current : '';
       return (
         <Fragment key={labyrinth}>
-          <td className={cnn}>{score}</td>
-          <td className={cnn}>{length}</td>
-          <td className={cnn}>{retry}</td>
-          <td className={cnn}>{level}</td>
+          <td className={current}>
+            <Link to={`/result/${result.id}`} title={result.user_name || 'Аноним'}>
+              {score}
+            </Link>
+          </td>
+          <td className={current}>{length}</td>
+          <td className={current}>{retry}</td>
+          <td className={current}>{level}</td>
         </Fragment>
       );
     })}
   </tr>
 );
 
-const AuthPanel = () => {
-  const session = useSession();
-  const { user } = useSessionState();
-  if (user) {
-    return (
-      <div className={cn.auth}>
-        <span className={cn.userName}>{user.name}</span>
-        <Button onClick={() => void session.logout()}>Logout</Button>
-      </div>
-    );
-  }
-  return (
-    <div className={cn.auth}>
-      <span className={cn.authHint}>Login to submit your result:</span>
-      <Button className={cn.loginBtn} onClick={() => void session.login('yandex')}>
-        Yandex
-      </Button>
-      <Button className={cn.loginBtn} onClick={() => void session.login('google')}>
-        Google
-      </Button>
-    </div>
-  );
-};
-
 type ResultsProps = {
-  onRestart: () => void;
-  onResurrect: () => void;
+  results: ResultDump[];
+  selectedId?: number;
 };
 
-const Results = ({ onRestart, onResurrect }: ResultsProps) => {
-  const stamps = useStamps();
-  const results = stamps.all();
-  const currentObject = results[results.length - 1];
-
-  const levels: LevelEntry[][] = new Array(6).fill(null).map(() => []);
-  for (const stamp of results) {
-    const { eatens, labyrinth, score, level, retryCounter } = stamp;
-    levels[labyrinth].push({
-      length: eatens?.length ?? 0,
-      score,
-      level,
-      retry: retryCounter ?? 0,
-      stamp,
-    });
-  }
-
-  const [orderBy, setOrderBy] = useState(
-    () => localStorage.getItem('order') ?? orderSelector[0].key,
+/** Таблица результатов по лабиринтам (страница /result и /result/:id). */
+const Results = ({ results, selectedId }: ResultsProps) => {
+  const [orderBy, setOrderBy] = useState<OrderKey>(
+    () => (localStorage.getItem('order') as OrderKey) || 'score',
   );
-  const onDropdownClick = ({ key }: { key: string }) => {
-    setOrderBy(key);
-    localStorage.setItem('order', key);
-  };
 
-  let currentIdx = -1;
-  for (const lvl of levels) {
-    lvl.sort((a, b) => b[orderBy as 'score'] - a[orderBy as 'score']);
-    const cur = lvl.find(({ stamp }) => stamp === currentObject);
-    if (cur) {
-      currentIdx = lvl.indexOf(cur);
+  const levels = useMemo(() => {
+    const buckets: Entry[][] = Array.from({ length: LABYRINTH_COUNT }, () => []);
+    for (const result of results) {
+      if (result.labyrinth < 0 || result.labyrinth >= LABYRINTH_COUNT) continue;
+      buckets[result.labyrinth].push({
+        length: result.eatens?.length ?? 0,
+        score: result.score,
+        level: result.level,
+        retry: result.retryCounter,
+        result,
+      });
     }
-  }
+    for (const lvl of buckets) {
+      lvl.sort((a, b) => b[orderBy] - a[orderBy]);
+    }
+    return buckets;
+  }, [results, orderBy]);
 
-  if (!currentObject) {
-    return null;
-  }
-
-  const maxPlayed = Math.max(...levels.map((a) => a.length));
+  const maxPlayed = Math.max(0, ...levels.map((a) => a.length));
 
   return (
     <div className={cn.wrap}>
-      <h2>{currentObject.isWin ? 'Congratulation! You win!' : 'Game over'}</h2>
-      <AuthPanel />
+      <h1>Results</h1>
       <div>
-        Order by:
-        <Dropdown
-          menu={{
-            items: orderSelector,
-            onClick: onDropdownClick,
-            selectedKeys: [orderBy],
+        Order by:{' '}
+        <select
+          className={cn.order}
+          value={orderBy}
+          onChange={(e) => {
+            const key = e.target.value as OrderKey;
+            setOrderBy(key);
+            localStorage.setItem('order', key);
           }}
-          placement="bottom"
         >
-          <Button tabIndex={3} className={cn.order}>
-            {orderSelector.find(({ key }) => key === orderBy)?.label}
-          </Button>
-        </Dropdown>
+          {orderSelector.map(({ key, label }) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
       </div>
       <table className={cn.table}>
         <thead>
@@ -162,45 +130,22 @@ const Results = ({ onRestart, onResurrect }: ResultsProps) => {
           </tr>
         </thead>
         <tbody>
-          {new Array(Math.min(maxPlayed, Math.max(10, currentIdx <= 11 ? currentIdx + 1 : 0)))
-            .fill(null)
-            .map((_, resultPos) => (
+          {maxPlayed === 0 ? (
+            <tr>
+              <td colSpan={1 + 4 * LABYRINTH_COUNT}>No results yet</td>
+            </tr>
+          ) : (
+            new Array(maxPlayed).fill(null).map((_, resultPos) => (
               <Row
                 key={resultPos}
                 resultPos={resultPos}
                 levels={levels}
-                currentObject={currentObject}
+                selectedId={selectedId}
               />
-            ))}
-          {currentIdx > 11 && (
-            <Fragment>
-              <tr className={cn.elapse}>
-                <td>...</td>
-                <td colSpan={4 * levels.length} />
-              </tr>
-              <Row
-                resultPos={currentIdx}
-                levels={levels}
-                currentObject={currentObject}
-              />
-            </Fragment>
+            ))
           )}
         </tbody>
       </table>
-      <div className={cn.other}>
-        <MiniField stamp={currentObject} />
-        <div className={cn.buttons}>
-          <Button tabIndex={1} onClick={onRestart} autoFocus>
-            Restart
-          </Button>
-          {currentObject.eatens.length >= 10 && (
-            <Button tabIndex={2} onClick={onResurrect}>
-              Resurect
-            </Button>
-          )}
-        </div>
-        <Achievements />
-      </div>
     </div>
   );
 };

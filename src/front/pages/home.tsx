@@ -21,7 +21,7 @@ export const Home = () => {
 
     return frontend.onGameOver((game) => {
       stampsRef.current.add(game.stamp());
-      navigateRef.current('/leaderboard');
+      navigateRef.current('/result', { state: { justFinished: true } });
     });
   }, [frontend]);
 
@@ -38,7 +38,7 @@ export const Home = () => {
         if (callback.ok) {
           sessionRef.current.setUser(callback.user, false);
         }
-        navigateRef.current('/leaderboard');
+        navigateRef.current('/result', { state: { justFinished: true } });
       }
     })();
   }, [frontend]);
