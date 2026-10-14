@@ -13,3 +13,6 @@
 
 npm-debug.log*
 agent.sh
+
+# local sqlite
+db.db

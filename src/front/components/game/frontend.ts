@@ -40,15 +40,18 @@ class Frontend {
     this.game.onAchievement = (type, g) => achievements.accept(type, g);
     achievements.accept('started', this.game);
     this.game.onGameOver.push(() => {
-      console.log('frontend game over', this.#onGameOver)
       this.#onGameOver.forEach((callback) => callback(this.game!));
       if (this.interval) clearInterval(this.interval);
     });
     this.onResume(0);
   }
 
-  onGameOver(callback: (game: Game) => void): void {
+  onGameOver(callback: (game: Game) => void): () => void {
     this.#onGameOver.push(callback);
+    return () => {
+      const i = this.#onGameOver.indexOf(callback);
+      if (i >= 0) this.#onGameOver.splice(i, 1);
+    };
   }
 
   onNextPage(): void {

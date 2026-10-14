@@ -9,20 +9,17 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
 
   useEffect(() => {
     const canvas = ref.current;
-    if (canvas === null || render.current !== null) {
+    if (canvas === null) {
       return;
     }
     render.current = bindRender(ref, frontend);
     frontend.update = render.current;
 
-    window.addEventListener('resize', render.current, true);
-
-    canvas.addEventListener('blur', () => {
+    const onResize = () => render.current?.();
+    const onBlur = () => {
       frontend.onPause();
-    });
-    canvas.contentEditable = 'true';
-    canvas.focus();
-    canvas.addEventListener('keydown', ({ key }) => {
+    };
+    const onKeyDown = ({ key }: KeyboardEvent) => {
       switch (key.toLowerCase()) {
         case 'arrowleft':
         case 'd':
@@ -66,12 +63,23 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
         default:
           return;
       }
-    });
+    };
+
+    window.addEventListener('resize', onResize, true);
+    canvas.addEventListener('blur', onBlur);
+    canvas.contentEditable = 'true';
+    canvas.focus();
+    canvas.addEventListener('keydown', onKeyDown);
     render.current();
+
     return () => {
-      if (render.current) {
-        window.removeEventListener('resize', render.current, true);
+      window.removeEventListener('resize', onResize, true);
+      canvas.removeEventListener('blur', onBlur);
+      canvas.removeEventListener('keydown', onKeyDown);
+      if (frontend.update === render.current) {
+        frontend.update = undefined;
       }
+      render.current = null;
     };
   }, [frontend]);
 

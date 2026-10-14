@@ -1,11 +1,10 @@
 import type { RouteObject } from 'react-router-dom';
-import { Outlet, type LoaderFunctionArgs } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { DocumentMeta } from '../router/meta';
 import { loadResults, loadResult } from '../router/loaders';
 import type { MetaContext, RouteMeta } from '../router/meta';
 import type { ResultDump } from '../types/result';
 import { Home } from '../pages/home';
-import { Play } from '../pages/play';
 import { Leaderboard } from '../pages/leaderboard';
 import { Result } from '../pages/result';
 import { AuthCallback } from '../pages/authCallback';
@@ -37,7 +36,6 @@ const routes: RouteObject[] = [
         id: 'home',
         index: true,
         Component: Home,
-        loader: (args: LoaderFunctionArgs) => loadResults(args, 5),
         handle: {
           meta: {
             title: 'Nokia 3310 Snake 2',
@@ -54,17 +52,6 @@ const routes: RouteObject[] = [
               url: 'https://snake3310.io/',
               playMode: 'SinglePlayer',
             }),
-          } satisfies RouteMeta,
-        },
-      },
-      {
-        id: 'play',
-        path: 'play',
-        Component: Play,
-        handle: {
-          meta: {
-            title: 'Играть — Nokia 3310 Snake 2',
-            description: 'Запустите змейку на десктопе с клавиатурой.',
           } satisfies RouteMeta,
         },
       },
