@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Stamp } from '../../types/stamp';
 import type { PositionResponse } from '../../types/position';
 import { MiniField } from './MiniField';
+import cn from './resultCard.module.less';
 
 type ResultCardProps = {
   stamp: Stamp;
@@ -21,7 +22,7 @@ const ResultCard = ({ stamp, userName, position }: ResultCardProps) => {
   }
 
   return (
-    <section style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>
+    <section className={cn.resultCard}>
       <MiniField stamp={stamp} />
       <dl style={{ marginTop: 16 }}>
         <div>
@@ -45,12 +46,12 @@ const ResultCard = ({ stamp, userName, position }: ResultCardProps) => {
           <dd>{position ? `#${position.position} of ${position.total}` : '—'}</dd>
         </div>
         <div>
-          <dt>Retry</dt>
-          <dd>{stamp.retryCounter === 0 ? 'no retry' : `${stamp.retryCounter}`}</dd>
+          <dt>Resurrections</dt>
+          <dd>{stamp.retryCounter === 0 ? 'one life' : `${stamp.retryCounter}`}</dd>
         </div>
       </dl>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16, maxWidth: 200 }}>
-        <Button autoFocus onClick={onStart}>Start</Button>
+      <div className={cn.buttons}>
+        <Button autoFocus onClick={onStart}>New game</Button>
         {canResurrect && <Button onClick={onResurrect}>Resurrect</Button>}
       </div>
     </section>

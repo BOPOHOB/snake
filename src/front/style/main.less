@@ -17,3 +17,14 @@ h2 {
   text-align: center;
   max-height: 88px;
 }
+
+/* Толстая рамка на всех antd-кнопках. border-width нет в токенах antd (используется
+   глобальный lineWidth — его поднимать нельзя), а стили компонентов antd инжектятся
+   в рантайме после этого CSS — поэтому !important для надёжности. */
+.ant-btn {
+  border-width: 5px !important;
+  font-family: 'nokia', Verdana, Tahoma;
+}
+.ant-btn:focus-visible {
+  outline: none !important;
+}
