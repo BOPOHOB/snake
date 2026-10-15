@@ -57,6 +57,7 @@ export function createApp(db: Db, options: CreateAppOptions = {}) {
     app.get('/robots.txt', serveStatic({ root: clientDir }));
     app.get('/sitemap.xml', serveStatic({ root: clientDir }));
     app.get('/manifest.json', serveStatic({ root: clientDir }));
+    app.get('/og-home.png', serveStatic({ root: clientDir }));
   }
 
   let ssrPromise: Promise<SsrModule | null> | null = null;

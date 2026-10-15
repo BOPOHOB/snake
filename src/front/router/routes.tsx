@@ -20,6 +20,10 @@ const RootLayout = () => (
 
 const DESCRIPTION = 'Змейка с лабиринтами, яблоками, багами и уровнями скорости — ода Nokia 3310.';
 
+const HOME_TITLE = 'Snake 2';
+const HOME_DESCRIPTION =
+  'All 6 levels are the same as in the original game, with the same overall rating and attention to detail';
+
 const routes: RouteObject[] = [
   {
     id: 'root',
@@ -37,14 +41,15 @@ const routes: RouteObject[] = [
         Component: Home,
         handle: {
           meta: {
-            title: 'Nokia 3310 Snake 2',
-            description: DESCRIPTION,
+            title: HOME_TITLE,
+            description: HOME_DESCRIPTION,
             ogUrl: 'https://snake3310.io/',
+            ogImage: 'https://snake3310.io/og-home.png',
             jsonLd: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'VideoGame',
-              name: 'Nokia 3310 Snake 2',
-              description: DESCRIPTION,
+              name: HOME_TITLE,
+              description: HOME_DESCRIPTION,
               genre: ['Arcade', 'Retro'],
               gamePlatform: 'Web',
               applicationCategory: 'GameApplication',

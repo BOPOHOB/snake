@@ -10,6 +10,7 @@ import {
 import { ResultCard } from '../components/results/ResultCard';
 import { useStamps, useStampsState } from '../model/stamps';
 import { useSessionState } from '../model/session';
+import { toStamp } from '../model/resultToStamp';
 import type { ResultDump } from '../types/result';
 import type { PositionResponse } from '../types/position';
 import type { Stamp } from '../types/stamp';
@@ -25,22 +26,6 @@ type LocationState = {
   position?: PositionResponse | null;
   userName?: string | null;
 };
-
-function toStamp(r: ResultDump): Stamp {
-  return {
-    score: r.score,
-    bands: (r.bands as Stamp['bands']) ?? [],
-    head: r.head,
-    eatens: (r.eatens as Stamp['eatens']) ?? [],
-    tickId: r.tick_id,
-    level: r.level,
-    labyrinth: r.labyrinth,
-    apple: (r.apple as Stamp['apple']) ?? null,
-    bug: (r.bug as Stamp['bug']) ?? 5,
-    retryCounter: r.retryCounter,
-    isWin: r.isWin,
-  };
-}
 
 /**
  * Layout /result: карточка локального/серверного результата.
