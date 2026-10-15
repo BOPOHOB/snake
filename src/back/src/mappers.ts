@@ -48,10 +48,10 @@ const LABYRINTH_HEADS: number[][] = [
 type Band = { tickId: number; direction: [number, number] };
 
 /** Вычисляет head из bands + стартовой позиции лабиринта (без хранения в БД). */
-function computeHead(bandsRaw: unknown, labyrinth: number, tickId: number): number[] {
+export function computeHead(bandsRaw: unknown, labyrinth: number, tickId: number): number[] {
   const bands = (Array.isArray(bandsRaw) ? bandsRaw : []) as Band[];
   let head = [...LABYRINTH_HEADS[labyrinth] ?? [0, 0]];
-  for (let t = 1; t <= tickId; t++) {
+  for (let t = 0; t < tickId; t++) {
     let dir: [number, number] = [1, 0];
     for (let b = bands.length - 1; b >= 0; b--) {
       if (bands[b].tickId <= t) {
@@ -76,7 +76,7 @@ export function selectResultColumns(): string {
   return RESULT_COLUMNS;
 }
 
-function decodeBlob(blob: Uint8Array): unknown {
+export function decodeBlob(blob: Uint8Array): unknown {
   const text = new TextDecoder().decode(blob);
   try {
     return JSON.parse(text);
