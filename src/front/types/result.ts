@@ -16,7 +16,8 @@ export type ResultDump = {
   retryCounter: number;
   isWin: boolean;
   head: Point;
+  created_at: number;
 };
 
-/** Тело POST /api/result/add — дамп без id, user-полей и head (head считает бекенд). */
-export type AddResultBody = Omit<ResultDump, 'id' | 'user_id' | 'user_name' | 'head'>;
+/** Тело POST /api/result/add — дамп без id, user-полей, head и created_at (считает бекенд). */
+export type AddResultBody = Omit<ResultDump, 'id' | 'user_id' | 'user_name' | 'head' | 'created_at'>;

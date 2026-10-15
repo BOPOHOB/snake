@@ -201,7 +201,7 @@ class Game {
     const bodyArr = [...this.body()];
     const step = bodyArr[stepsBack]?.[1];
     if (step) this.head = [...step] as Point;
-    this.tickId = Math.max(0, this.tickId - 10);
+    this.tickId = Math.max(0, this.tickId - stepsBack);
     this.bands = this.bands.filter(({ tickId }) => tickId <= this.tickId);
     this.eatens = new Set([...this.eatens].filter((v) => v < this.tickId));
     this.gameover = false;

@@ -36,14 +36,20 @@ class Frontend {
   }
 
   startGame(): void {
-    this.game = new Game(this.level, this.labyrinth);
-    this.game.onAchievement = (type, g) => achievements.accept(type, g);
-    achievements.accept('started', this.game);
-    this.game.onGameOver.push(() => {
+    this.attachGame(new Game(this.level, this.labyrinth));
+    achievements.accept('started', this.game!);
+    this.onResume(0);
+  }
+
+  /** Привязывает готовую игру (новую или восстановленную из дампа) к фронту: */
+  /** onAchievement, onGameOver → #onGameOver, очистка interval по game over. */
+  attachGame(game: Game): void {
+    this.game = game;
+    game.onAchievement = (type, g) => achievements.accept(type, g);
+    game.onGameOver.push(() => {
       this.#onGameOver.forEach((callback) => callback(this.game!));
       if (this.interval) clearInterval(this.interval);
     });
-    this.onResume(0);
   }
 
   onGameOver(callback: (game: Game) => void): () => void {

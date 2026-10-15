@@ -43,6 +43,10 @@ export default defineConfig(({ isSsrBuild }) => ({
         target: 'http://127.0.0.1:8787',
         changeOrigin: true,
       },
+      '/og': {
+        target: 'http://127.0.0.1:8787',
+        changeOrigin: true,
+      },
     },
   },
 }));

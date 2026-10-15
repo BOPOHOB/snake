@@ -5,7 +5,8 @@
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@*": "1.1.6",
     "jsr:@std/path@1": "1.1.6",
-    "npm:@napi-rs/canvas@0.1.55": "0.1.55"
+    "npm:@napi-rs/canvas@0.1.55": "0.1.55",
+    "npm:hono@4.6.14": "4.6.14"
   },
   "jsr": {
     "@hono/hono@4.13.2": {
@@ -80,6 +81,9 @@
         "@napi-rs/canvas-linux-x64-musl",
         "@napi-rs/canvas-win32-x64-msvc"
       ]
+    },
+    "hono@4.6.14": {
+      "integrity": "sha512-j4VkyUp2xazGJ8eCCLN1Vm/bxdvm/j5ZuU9AIjLu9vapn2M44p9L3Ktr9Vnb2RN2QtcR/wVjZVMlT5k7GJQgPw=="
     }
   },
   "workspace": {

@@ -19,5 +19,6 @@ CREATE TABLE IF NOT EXISTS "result" (
 	"bug"	TEXT NOT NULL,
 	"retryCounter"	INTEGER NOT NULL,
 	"isWin"	INTEGER NOT NULL,
+	"created_at"	INTEGER NOT NULL DEFAULT (strftime('%s','now')),
 	PRIMARY KEY("id" AUTOINCREMENT)
 );

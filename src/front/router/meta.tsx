@@ -6,6 +6,9 @@ type RouteMeta = {
   title?: string;
   description?: string;
   ogImage?: string;
+  ogImageWidth?: number;
+  ogImageHeight?: number;
+  ogImageAlt?: string;
   ogUrl?: string;
   jsonLd?: string;
 };
@@ -91,7 +94,7 @@ const DocumentMeta = ({ children }: { children?: ReactNode }) => {
     upsertMeta('property', 'og:url', meta.ogUrl);
     upsertMeta('property', 'og:type', 'website');
     upsertMeta('name', 'twitter:card', 'summary_large_image');
-  }, [title, meta.description, meta.ogImage, meta.ogUrl]);
+  }, [title, meta.description, meta.ogImage, meta.ogImageWidth, meta.ogImageHeight, meta.ogImageAlt, meta.ogUrl]);
 
   return children ?? null;
 };
@@ -108,9 +111,13 @@ function renderHeadTags(meta: RouteMeta): string {
     `<meta property="og:title" content="${title}" />`,
     meta.description ? `<meta property="og:description" content="${escapeHtml(meta.description)}" />` : '',
     meta.ogImage ? `<meta property="og:image" content="${escapeHtml(meta.ogImage)}" />` : '',
+    meta.ogImageWidth ? `<meta property="og:image:width" content="${meta.ogImageWidth}" />` : '',
+    meta.ogImageHeight ? `<meta property="og:image:height" content="${meta.ogImageHeight}" />` : '',
+    meta.ogImageAlt ? `<meta property="og:image:alt" content="${escapeHtml(meta.ogImageAlt)}" />` : '',
     meta.ogUrl ? `<meta property="og:url" content="${escapeHtml(meta.ogUrl)}" />` : '',
     `<meta property="og:type" content="website" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
+    meta.ogImage ? `<meta name="twitter:image" content="${escapeHtml(meta.ogImage)}" />` : '',
     meta.jsonLd
       ? `<script type="application/ld+json">${escapeHtml(meta.jsonLd)}</script>`
       : '',

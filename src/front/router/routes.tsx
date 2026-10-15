@@ -45,6 +45,9 @@ const routes: RouteObject[] = [
             description: HOME_DESCRIPTION,
             ogUrl: 'https://snake3310.io/',
             ogImage: 'https://snake3310.io/og-home.png',
+            ogImageWidth: 1200,
+            ogImageHeight: 630,
+            ogImageAlt: 'Snake 2 — logo Nokia 3310',
             jsonLd: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'VideoGame',
@@ -67,7 +70,7 @@ const routes: RouteObject[] = [
         handle: {
           meta: {
             title: 'Results — Nokia 3310 Snake 2',
-            description: 'Таблица результатов по лабиринтам',
+            description: 'Results table',
           } satisfies RouteMeta,
         },
         children: [
@@ -85,14 +88,18 @@ const routes: RouteObject[] = [
                 const r = (data as { result: ResultDump | null } | null)?.result;
                 const id = params.id;
                 const base: RouteMeta = {
-                  title: 'Результат — Nokia 3310 Snake 2',
-                  description: 'Карточка результата игры.',
+                  title: 'Result — Nokia 3310 Snake 2',
+                  description: 'Result card.',
                 };
                 if (!r) return base;
                 return {
-                  title: `${r.user_name || 'Аноним'} — ${r.score} — Nokia 3310 Snake 2`,
-                  description: `Результат: счёт ${r.score}, уровень ${r.level}, лабиринт ${r.labyrinth}${r.isWin ? ' — победа' : ''}.`,
+                  title: `${r.user_name} — ${r.score} — Nokia 3310 Snake 2`,
+                  description: `Result: score ${r.score}, level ${r.level}, length ${r.eatens}${r.isWin ? ' — победа' : ''}.`,
                   ogUrl: id ? `https://snake3310.io/result/${id}` : undefined,
+                  ogImage: id ? `https://snake3310.io/og/result/${id}.png` : undefined,
+                  ogImageWidth: 1664,
+                  ogImageHeight: 686,
+                  ogImageAlt: `${r.user_name} result: score ${r.score}`,
                 };
               },
             },

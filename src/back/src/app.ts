@@ -1,12 +1,14 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
-import { serveStatic } from 'hono/deno';
 import { toFileUrl } from 'jsr:@std/path';
 import type { Db } from './db.ts';
 import { tryLoadAuthConfig } from './auth/config.ts';
 import { authRoutes } from './auth/routes.ts';
 import { resultsRoutes } from './routes/results.ts';
 import { resultRoutes } from './routes/result.ts';
+import { serveStaticFile } from './static.ts';
+import { mapResult, selectResultColumns, type ResultRow } from './mappers.ts';
+import { renderResultImage } from './og/image.ts';
 
 type SsrModule = {
   renderToHtml: (request: Request, template: string) => Promise<Response>;
@@ -49,15 +51,44 @@ export function createApp(db: Db, options: CreateAppOptions = {}) {
   app.route('/api/results', resultsRoutes(db));
   app.route('/api/result', resultRoutes(db, authConfig));
 
+  // og:image для карточки результата: /og/result/<id>.png
+  app.get('/og/result/:id', (c) => {
+    const id = Number(c.req.param('id').replace(/\.png$/, ''));
+    if (!Number.isInteger(id) || id < 1) {
+      return c.json({ error: 'Invalid id' }, 400);
+    }
+    const row = db
+      .prepare(`SELECT ${selectResultColumns()} FROM result WHERE id = ?`)
+      .get(id) as ResultRow | undefined;
+    if (!row) {
+      return c.text('Not found', 404);
+    }
+    const png = renderResultImage(
+      mapResult(db, row) as unknown as Parameters<typeof renderResultImage>[0],
+    );
+    return new Response(new Uint8Array(png), {
+      headers: {
+        'Content-Type': 'image/png',
+        'Cache-Control': 'public, max-age=31536000, immutable',
+      },
+    });
+  });
+
   const { clientDir, serverEntry } = options;
 
   if (clientDir) {
-    app.use('/assets/*', serveStatic({ root: clientDir }));
-    app.get('/favicon.ico', serveStatic({ root: clientDir }));
-    app.get('/robots.txt', serveStatic({ root: clientDir }));
-    app.get('/sitemap.xml', serveStatic({ root: clientDir }));
-    app.get('/manifest.json', serveStatic({ root: clientDir }));
-    app.get('/og-home.png', serveStatic({ root: clientDir }));
+    // Раздаём статику из clientDir (assets, шрифты, favicon-варианты, manifest,
+    // og-картинки и т.д.) с корректным Content-Length и поддержкой HEAD. '/' и app-роуты
+    // без расширения идут в SSR; реальные файлы (со расширением) и /assets/* — статика.
+    app.use('/*', async (c, next) => {
+      const p = c.req.path;
+      if (p === '/' || (!p.startsWith('/assets/') && !/\.[A-Za-z0-9]+$/.test(p))) {
+        return next();
+      }
+      const res = await serveStaticFile(clientDir, p, c.req.method);
+      if (res) return res;
+      return next();
+    });
   }
 
   let ssrPromise: Promise<SsrModule | null> | null = null;

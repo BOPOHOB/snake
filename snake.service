@@ -7,7 +7,7 @@ Type=simple
 User=bopohob
 Group=bopohob
 WorkingDirectory=/opt/snake/src/back
-ExecStart=/usr/local/bin/deno run -A --env-file=/opt/snake/.env /opt/snake/src/back/src/main.ts
+ExecStart=/usr/local/bin/deno run -A --sloppy-imports --env-file=/opt/snake/.env /opt/snake/src/back/src/main.ts
 Restart=on-failure
 RestartSec=3
 Environment=HOST=127.0.0.1

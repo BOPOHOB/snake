@@ -49,6 +49,8 @@ rsync -az --delete \
   --exclude='.env' \
   --exclude='.gitignore' \
   src/back/ "${REMOTE}:${REMOTE_DIR}/src/back/"
+# src/front нужен бекенду в рантайме: og/image.ts импортирует paint/assets/restore/resultToStamp.
+rsync -az --delete src/front/ "${REMOTE}:${REMOTE_DIR}/src/front/"
 scp snake.service schema.sql "${REMOTE}:${REMOTE_DIR}/"
 
 # Nginx: только если на сервере ещё нет (чтобы не затереть правки certbot)

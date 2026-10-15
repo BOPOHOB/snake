@@ -66,8 +66,8 @@ export function resultRoutes(db: Db, authConfig: AuthConfig | null) {
     const info = db.prepare(`
       INSERT INTO result (
         user_id, score, bands, eatens, tick_id, level, labyrinth,
-        apple, bug, retryCounter, isWin
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        apple, bug, retryCounter, isWin, created_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       user.id,
       parsed.score,
@@ -80,6 +80,7 @@ export function resultRoutes(db: Db, authConfig: AuthConfig | null) {
       encodeText(parsed.bug),
       parsed.retryCounter,
       parsed.isWin ? 1 : 0,
+      Math.floor(Date.now() / 1000),
     );
 
     const id = Number(info.lastInsertRowid);

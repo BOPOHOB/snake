@@ -14,6 +14,7 @@ export type ResultRow = {
   bug: string;
   retryCounter: number;
   isWin: number;
+  created_at: number;
 };
 
 /** Полный дамп результата (для /api/results и /api/result/:id). */
@@ -32,6 +33,7 @@ export type ResultDump = {
   retryCounter: number;
   isWin: boolean;
   head: number[];
+  created_at: number;
 };
 
 const FIELD_W = 20;
@@ -69,7 +71,7 @@ export function computeHead(bandsRaw: unknown, labyrinth: number, tickId: number
 }
 
 const RESULT_COLUMNS = `
-  id, user_id, score, bands, eatens, tick_id, level, labyrinth, apple, bug, retryCounter, isWin
+  id, user_id, score, bands, eatens, tick_id, level, labyrinth, apple, bug, retryCounter, isWin, created_at
 `;
 
 export function selectResultColumns(): string {
@@ -120,6 +122,7 @@ export function mapResult(
     retryCounter: row.retryCounter,
     isWin: Boolean(row.isWin),
     head: computeHead(decodeBlob(row.bands), row.labyrinth, row.tick_id),
+    created_at: row.created_at,
   };
 }
 
