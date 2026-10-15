@@ -255,7 +255,7 @@ export function computePosition(
     labyrinth,
     score,
     position: before + 1,
-    total: totalRow.c,
+    total: totalRow.c + 1,
     before,
     after,
   };

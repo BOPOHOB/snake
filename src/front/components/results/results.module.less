@@ -3,7 +3,8 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   max-height: calc(100vh - 58px);
   padding-bottom: 50px;
 
@@ -19,7 +20,16 @@
     }
   }
 
+  // Отдельный скролл-контейнер для таблицы: width:100% + overflow-x:auto.
+  // Центрирование таблицы через margin:0 auto (а не через flex align-items),
+  // иначе при переполнении левая часть уезжает за origin скролла и недоступна.
+  .scroll {
+    width: 100%;
+    overflow-x: auto;
+  }
+
   .table {
+    margin: 0 auto;
     table-layout: fixed;
     border-spacing: 5px 5px;
     border-collapse: separate;

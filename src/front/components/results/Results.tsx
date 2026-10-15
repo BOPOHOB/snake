@@ -86,9 +86,27 @@ const Results = ({ results, selectedId }: ResultsProps) => {
 
   const maxPlayed = Math.max(0, ...levels.map((a) => a.length));
 
+  // Позиция выбранного результата в его лабиринте (после сортировки).
+  const currentIdx = useMemo(() => {
+    if (selectedId == null) return -1;
+    for (const lvl of levels) {
+      const idx = lvl.findIndex((e) => e.result.id === selectedId);
+      if (idx >= 0) return idx;
+    }
+    return -1;
+  }, [levels, selectedId]);
+
+  // Сколько первых строк показать перед многоточием. Если выбранный результат
+  // в пределах первых 12 строк — показываем достаточно строк чтобы его включить
+  // (минимум 10). Если дальше — показываем первые 10, затем «...» и строку с ним.
+  const headCount =
+    currentIdx < 0
+      ? maxPlayed
+      : Math.min(maxPlayed, Math.max(10, currentIdx <= 11 ? currentIdx + 1 : 10));
+  const showEllipsis = currentIdx > 11 && currentIdx < maxPlayed - 1;
+
   return (
-    <div className={cn.wrap}>
-      <h1>Results</h1>
+    <div className={cn.wrap}>\
       <div>
         Order by:{' '}
         <select
@@ -107,45 +125,63 @@ const Results = ({ results, selectedId }: ResultsProps) => {
           ))}
         </select>
       </div>
-      <table className={cn.table}>
-        <thead>
-          <tr>
-            <th />
-            {levels.map((_, labyrinth) => (
-              <th colSpan={4} key={labyrinth}>
-                <BitScene data={assets.labyrinth[labyrinth]} />
-              </th>
-            ))}
-          </tr>
-          <tr>
-            <th>#</th>
-            {levels.map((_, labyrinth) => (
-              <Fragment key={labyrinth}>
-                <th>score</th>
-                <th>len</th>
-                <th>rtry</th>
-                <th>lvl</th>
-              </Fragment>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {maxPlayed === 0 ? (
+      <div className={cn.scroll}>
+        <table className={cn.table}>
+          <thead>
             <tr>
-              <td colSpan={1 + 4 * LABYRINTH_COUNT}>No results yet</td>
+              <th />
+              {levels.map((_, labyrinth) => (
+                <th colSpan={4} key={labyrinth}>
+                  <BitScene data={assets.labyrinth[labyrinth]} />
+                </th>
+              ))}
             </tr>
-          ) : (
-            new Array(maxPlayed).fill(null).map((_, resultPos) => (
-              <Row
-                key={resultPos}
-                resultPos={resultPos}
-                levels={levels}
-                selectedId={selectedId}
-              />
-            ))
-          )}
-        </tbody>
-      </table>
+            <tr>
+              <th>#</th>
+              {levels.map((_, labyrinth) => (
+                <Fragment key={labyrinth}>
+                  <th>score</th>
+                  <th>len</th>
+                  <th>rtry</th>
+                  <th>lvl</th>
+                </Fragment>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {maxPlayed === 0 ? (
+              <tr>
+                <td colSpan={1 + 4 * LABYRINTH_COUNT}>No results yet</td>
+              </tr>
+            ) : (
+              <>
+                {new Array(headCount).fill(null).map((_, resultPos) => (
+                  <Row
+                    key={resultPos}
+                    resultPos={resultPos}
+                    levels={levels}
+                    selectedId={selectedId}
+                  />
+                ))}
+                {showEllipsis && (
+                  <>
+                    <tr className={cn.elapse} key="elapse">
+                      <td>...</td>
+                      <td colSpan={4 * LABYRINTH_COUNT} />
+                    </tr>
+                    <Row
+                      key={currentIdx}
+                      resultPos={currentIdx}
+                      levels={levels}
+                      selectedId={selectedId}
+                    />
+                  </>
+                )}
+              </>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

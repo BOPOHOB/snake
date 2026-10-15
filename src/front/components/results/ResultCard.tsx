@@ -38,10 +38,6 @@ const ResultCard = ({ stamp, userName, position }: ResultCardProps) => {
           <dd>{stamp.level}</dd>
         </div>
         <div>
-          <dt>Labyrinth</dt>
-          <dd>{stamp.labyrinth}</dd>
-        </div>
-        <div>
           <dt>Position</dt>
           <dd>{position ? `#${position.position} of ${position.total}` : '—'}</dd>
         </div>
