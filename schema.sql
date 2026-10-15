@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS "user" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"name"	TEXT NOT NULL,
+	"auth_vendor"	TEXT NOT NULL,
+	"auth_code"	TEXT NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+
+CREATE TABLE IF NOT EXISTS "result" (
+	"id"	INTEGER NOT NULL UNIQUE,
+	"user_id"	INTEGER NOT NULL,
+	"score"	INTEGER NOT NULL,
+	"bands"	BLOB NOT NULL,
+	"eatens"	BLOB NOT NULL,
+	"tick_id"	INTEGER NOT NULL,
+	"level"	INTEGER NOT NULL,
+	"labyrinth"	INTEGER NOT NULL,
+	"apple"	TEXT NOT NULL,
+	"bug"	TEXT NOT NULL,
+	"retryCounter"	INTEGER NOT NULL,
+	"isWin"	INTEGER NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
