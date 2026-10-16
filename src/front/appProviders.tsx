@@ -4,8 +4,6 @@ import { ConfigProvider } from 'antd';
 import ruRU from 'antd/locale/ru_RU';
 import { SessionProvider, useSessionState } from './model/session';
 import { StampsProvider, useStamps, useStampsState } from './model/stamps';
-import { achievements } from './services/achievements';
-import { achieveMessage } from './components/achieveMessage/achieveMessage';
 import { bgColor, fgColor } from './components/game/colors';
 
 // Глобальная тема antd: пиксельный шрифт Nokia + ретро-кнопки (толстая чёрная рамка,

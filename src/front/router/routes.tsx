@@ -9,6 +9,7 @@ import { ResultsLayout } from '../pages/resultsLayout';
 import { AuthCallback } from '../pages/authCallback';
 import { NotFound } from '../pages/notFound';
 import { Outline } from './outline';
+import { Achievements } from '../components/achievements/Achievements';
 
 const RootLayout = () => (
   <DocumentMeta>
@@ -76,7 +77,7 @@ const routes: RouteObject[] = [
         children: [
           {
             index: true,
-            Component: () => null,
+            Component: () => <Achievements />,
           },
           {
             id: 'result',

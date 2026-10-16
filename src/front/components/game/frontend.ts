@@ -1,6 +1,6 @@
 import { Game } from './game';
 import { assets } from './assets';
-import { achievements } from '../../services/achievements';
+import { achievements } from '../../services/achivements.ts';
 import type { Point } from '../../types/stamp';
 
 class Frontend {

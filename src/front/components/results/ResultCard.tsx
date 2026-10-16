@@ -51,7 +51,6 @@ const ResultCard = ({ stamp, userName, position }: ResultCardProps) => {
         <Button autoFocus onClick={onStart}>New game</Button>
         {canResurrect && <Button onClick={onResurrect}>Resurrect</Button>}
       </div>
-      <Achievements />
     </section>
   );
 };

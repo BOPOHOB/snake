@@ -14,6 +14,7 @@ import { toStamp } from '../model/resultToStamp';
 import type { ResultDump } from '../types/result';
 import type { PositionResponse } from '../types/position';
 import type { Stamp } from '../types/stamp';
+import { Achievements } from '../components/achievements/Achievements';
 
 type ResultLoaderData = {
   result: ResultDump | null;

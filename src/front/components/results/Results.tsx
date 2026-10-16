@@ -106,7 +106,7 @@ const Results = ({ results, selectedId }: ResultsProps) => {
   const showEllipsis = currentIdx > 11 && currentIdx < maxPlayed - 1;
 
   return (
-    <div className={cn.wrap}>\
+    <div className={cn.wrap}>
       <div>
         Order by:{' '}
         <select

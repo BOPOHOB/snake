@@ -1,7 +1,7 @@
 import { BitScene } from '../elements/BitScene';
-import { achievements } from '../../services/achievements';
 import classNames from 'classnames';
 import cn from './achievements.module.less';
+import { achievements } from '../../services/achivements';
 
 type AchievementLike = {
   isResurrected: boolean;
