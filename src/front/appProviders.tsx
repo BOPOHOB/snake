@@ -46,7 +46,7 @@ function StampsSync() {
 function AchievementsWiring() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    achievements.onAchieved = achieveMessage;
+    //achievements.onAchieved = achieveMessage;
   }, []);
   return null;
 }
