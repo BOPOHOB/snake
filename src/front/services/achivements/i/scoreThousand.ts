@@ -2,13 +2,17 @@ import { Achievement, type AchievementType } from "../achivement";
 
 class ScoreThousand extends Achievement {
   name = 'Not a beginner' as const;
-  details = 'Collect 1000 points in any game';
+  progress = {
+    all: 1000,
+    now: 0
+  };
   
   accept(type: AchievementType, game: any) {
     switch (type) {
     case 'finished':
     case 'score':
-      if (game.score >= 1000) {
+      this.progress.now = Math.max(game.stamp.score, this.progress.now);
+      if (this.progress.now >= 1000) {
         this.finish();
       }
       return;

@@ -3,7 +3,6 @@ import { assets } from '../../../components/game/assets';
 
 class ExplorerAchieve extends Achievement {
   name = 'Explorer' as const;
-  details = 'Visit all labyrinths';
 
   progress = {
     all: assets.labyrinth.length,
@@ -16,8 +15,8 @@ class ExplorerAchieve extends Achievement {
     switch (type) {
     case 'finished':
     case 'started':
-      this.state[game.labyrinth] = true;
-      this.progress.now = this.state.reduce((sum: number, cur: boolean) => cur ? sum + 1 : sum, 0);
+      this.state[game.stamp.labyrinth] = true;
+      this.progress.now = this.state.reduce((sum: number, cur: boolean) => sum + Number(cur), 0);
       if (this.state.indexOf(false) < 0) {
         this.finish();
       }

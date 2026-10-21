@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
-import { useEffect } from 'react';
-import { ConfigProvider } from 'antd';
+import { useCallback, useEffect } from 'react';
+import { ConfigProvider, notification } from 'antd';
 import ruRU from 'antd/locale/ru_RU';
 import { SessionProvider, useSessionState } from './model/session';
 import { StampsProvider, useStamps, useStampsState } from './model/stamps';
 import { bgColor, fgColor } from './components/game/colors';
+import { achievements } from './services/achivements/achivements';
 
 // Глобальная тема antd: пиксельный шрифт Nokia + ретро-кнопки (толстая чёрная рамка,
 // зелёный фон как везде на сайте, hover-инверсия в чёрный) на всех antd-кнопках проекта.
@@ -42,11 +43,16 @@ function StampsSync() {
 
 /** Глобально вешает обработчик достижения (только в браузере). */
 function AchievementsWiring() {
+  const [api, contextHolder] = notification.useNotification();
+
+  const achieveMessage = useCallback(() => {
+    api.info({ message: 'я ачивка' });
+  }, [api]);
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    //achievements.onAchieved = achieveMessage;
-  }, []);
-  return null;
+    achievements.onAchieved = achieveMessage;
+  }, [achieveMessage]);
+  return contextHolder;
 }
 
 const AppProviders = ({ children }: { children: ReactNode }) => {
