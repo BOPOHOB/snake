@@ -4,7 +4,6 @@ import type { Stamp } from '../../types/stamp';
 import type { PositionResponse } from '../../types/position';
 import { MiniField } from './MiniField';
 import cn from './resultCard.module.less';
-import { Achievements } from '../achievements/Achievements';
 
 type ResultCardProps = {
   stamp: Stamp;

@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import {
-  Outlet,
   useLocation,
   useNavigate,
   useParams,
@@ -15,6 +14,8 @@ import type { ResultDump } from '../types/result';
 import type { PositionResponse } from '../types/position';
 import type { Stamp } from '../types/stamp';
 import { Achievements } from '../components/achievements/Achievements';
+
+import cn from './results.module.less';
 
 type ResultLoaderData = {
   result: ResultDump | null;
@@ -32,7 +33,7 @@ type LocationState = {
  * Layout /result: карточка локального/серверного результата.
  * Остаётся смонтированной при replace /result → /result/:id, поэтому визуал не мигает.
  */
-export const ResultsLayout = () => {
+export const Results = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -97,15 +98,15 @@ export const ResultsLayout = () => {
           <h2>Результат не найден</h2>
           <p>Возможно, результат был удалён или ссылка неверна.</p>
         </section>
-        <Outlet />
+        <Achievements />
       </>
     );
   }
 
   return (
-    <>
+    <div className={cn.content}>
       {stamp && <ResultCard stamp={stamp} userName={userName} position={position} />}
-      <Outlet />
-    </>
+      <Achievements />
+    </div>
   );
 };

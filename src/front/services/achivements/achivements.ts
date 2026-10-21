@@ -1,4 +1,4 @@
-import { assets } from '../components/game/assets';
+import { assets } from '../../components/game/assets';
 import { ICONS } from './achivementsIcon';
 
 type AchievementType = 'finished' | 'score' | 'no bug' | 'win' | 'ate bug' | 'started';
@@ -20,7 +20,7 @@ abstract class Achievement {
   abstract accept(type: AchievementType, context: any): void;
 }
 
-class DemoAchieve extends Achievement {
+class ExplorerAchieve extends Achievement {
   name = 'Explorer';
   details = 'Visit all labyrinths';
 
@@ -92,7 +92,7 @@ class AchievePlug  extends Achievement {
     [0,1,1,1,0],
   ];
 
-  accept(type: AchievementType, game: any) {
+  accept(_type: AchievementType, _game: any) {
   }
 
   static create(name: string, description: string) {
@@ -201,7 +201,7 @@ class Achievements
     for (const achievements of [this.achievements, this.resurrected]) {
       achievements.push(new ScoreThousand());
       achievements.push(new ScoreThousandForAll());
-      achievements.push(new DemoAchieve());
+      achievements.push(new ExplorerAchieve());
       for (const [key, description] of Object.entries(this.zzzzzz)) {
         achievements.push(AchievePlug.create(key, description));
       }

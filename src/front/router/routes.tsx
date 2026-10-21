@@ -5,11 +5,10 @@ import { loadResults, loadResult } from '../router/loaders';
 import type { MetaContext, RouteMeta } from '../router/meta';
 import type { ResultDump } from '../types/result';
 import { Home } from '../pages/home';
-import { ResultsLayout } from '../pages/resultsLayout';
+import { Results } from '../pages/results';
 import { AuthCallback } from '../pages/authCallback';
 import { NotFound } from '../pages/notFound';
 import { Outline } from './outline';
-import { Achievements } from '../components/achievements/Achievements';
 
 const RootLayout = () => (
   <DocumentMeta>
@@ -66,7 +65,7 @@ const routes: RouteObject[] = [
       {
         id: 'results',
         path: 'result',
-        Component: ResultsLayout,
+        Component: Results,
         loader: (args) => loadResults(args),
         handle: {
           meta: {
@@ -77,7 +76,6 @@ const routes: RouteObject[] = [
         children: [
           {
             index: true,
-            Component: () => <Achievements />,
           },
           {
             id: 'result',

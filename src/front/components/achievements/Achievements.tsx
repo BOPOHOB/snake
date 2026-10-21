@@ -1,7 +1,7 @@
 import { BitScene } from '../elements/BitScene';
 import classNames from 'classnames';
 import cn from './achievements.module.less';
-import { achievements } from '../../services/achivements';
+import { achievements } from '../../services/achivements/achivements';
 
 type AchievementLike = {
   isResurrected: boolean;
@@ -18,7 +18,7 @@ const Achievement = ({ achivement }: { achivement: AchievementLike }) => {
     <li
       className={classNames({
         [cn.resurrected]: resurrected,
-        [cn.finished]: achivement.isFinished,
+        [cn.finished]: achivement.isFinished || true,
       })}
     >
       <BitScene
