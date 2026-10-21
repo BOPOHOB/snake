@@ -71,7 +71,7 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
   }, [pathname, onResults]);
 
   return (
-    <main>
+    <main className={onResults ? cn.mainResults : undefined}>
       <header className={cn.header}>
         <h1>Nokia 3310 Snake 2</h1>
         <nav>

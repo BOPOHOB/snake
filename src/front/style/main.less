@@ -28,3 +28,28 @@ h2 {
 .ant-btn:focus-visible {
   outline: none !important;
 }
+
+/* Скроллбар в общем стиле приложения: чёрная рамка, чёрный трек, чёрный ползунок
+   с зелёной (цвет фона) внутренней обводкой — иначе он невидим на чёрном треке. */
+* {
+  scrollbar-color: #000 @bgColor;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+*::-webkit-scrollbar-track {
+  background: #000;
+}
+*::-webkit-scrollbar-thumb {
+  background: #000;
+  border: 4px solid @bgColor;
+  box-shadow: inset 0 0 0 2px #000;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: @bgColor;
+  border-color: #000;
+  box-shadow: inset 0 0 0 2px #000;
+}

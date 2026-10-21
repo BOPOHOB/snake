@@ -1,5 +1,4 @@
 import { Achievement, type AchievementType } from "../achivement";
-import { ICONS } from "../achivementsIcon";
 
 class ScoreThousand extends Achievement {
   name = 'Not a beginner' as const;
