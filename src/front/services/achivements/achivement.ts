@@ -1,3 +1,4 @@
+import type { Stamp } from "../../types/stamp";
 import { achievements } from "./achivements";
 import { ICONS } from "./achivementsIcon";
 
@@ -45,7 +46,7 @@ abstract class Achievement {
     achievements?.onAchieved?.(this);
   };
 
-  abstract accept(type: AchievementType, context: any): void;
+  abstract accept(type: AchievementType, context: Stamp): void;
 }
 
 export { Achievement, type AchievementType };

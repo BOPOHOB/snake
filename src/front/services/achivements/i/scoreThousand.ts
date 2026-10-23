@@ -1,3 +1,4 @@
+import type { Stamp } from "../../../types/stamp";
 import { Achievement, type AchievementType } from "../achivement";
 
 class ScoreThousand extends Achievement {
@@ -7,11 +8,11 @@ class ScoreThousand extends Achievement {
     now: 0
   };
   
-  accept(type: AchievementType, game: any) {
+  accept(type: AchievementType, game: Stamp) {
     switch (type) {
     case 'finished':
     case 'score':
-      this.progress.now = Math.max(game.stamp.score, this.progress.now);
+      this.progress.now = Math.max(game.score, this.progress.now);
       if (this.progress.now >= 1000) {
         this.finish();
       }

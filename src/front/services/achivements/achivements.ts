@@ -1,4 +1,5 @@
 import { assets } from '../../components/game/assets';
+import type { Stamp } from '../../types/stamp';
 import { Achievement } from './achivement';
 import { ICONS } from './achivementsIcon';
 import { ExplorerAchieve } from './i/explorer';
@@ -31,7 +32,7 @@ class Achievements
 
   onAchieved?: (a: Achievement) => void;
 
-  accept(eventType: AchievementType, context: any)
+  accept(eventType: AchievementType, context: Stamp)
   {
     if (context.retryCounter === 0) {
       for (const achievement of this.achievements) {
@@ -59,7 +60,9 @@ class Achievements
       achievements.push(new ScoreThousandForAll());
       achievements.push(new ExplorerAchieve());
       for (const [key] of Object.entries(ICONS)) {
-        achievements.push(AchievePlug.create(key));
+        if (achievements.find(n => n.name === key) === undefined) {
+          achievements.push(AchievePlug.create(key));
+        }
       }
     }
     for (const achievement of this.resurrected) {
@@ -67,7 +70,8 @@ class Achievements
     }
     if (typeof localStorage !== 'undefined') {
       for (const stamp of JSON.parse(localStorage.getItem('stamp') ?? '[]')) {
-        this.accept('finished', stamp);
+        console.log(stamp);
+        this.accept('finished', stamp.stamp);
       }
     }
   }
