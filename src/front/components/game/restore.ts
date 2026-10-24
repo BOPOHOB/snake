@@ -16,7 +16,7 @@ function restoreGameFromStamp(stamp: Stamp): Game {
   game.bug = stamp.bug;
   game.retryCounter = stamp.retryCounter ?? 0;
   game.isWin = stamp.isWin;
-  game.gameover = true;
+  game.gameOver = true;
   return game;
 }
 
