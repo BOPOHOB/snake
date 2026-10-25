@@ -2,17 +2,13 @@ type Point = number;
 type PointObject = [number, number];
 
 const objectPoint = ([x, y]: PointObject): number => (y << 10) + x;
-const pointObject = (h: number): PointObject => [h % (1 << 10), h >> 10];
+const pointObject = (p: number): PointObject => [p & ((1 << 10) - 1), p >> 10];
 
 // top, right, bottom, top всё как в css, но массив выдавать слишком расточительно. Теперь enum
 type Direction = 0 | 1 | 2 | 3;
 
-const neighbors = (p: Point): [Point, Point, Point, Point] => [
-  p - (1 << 10),
-  p + 1,
-  p + (1 << 10),
-  p - 1
-];
+// Положительный модуль без веток: работает для отрицательных n.
+const pmod = (n: number, m: number): number => ((n % m) + m) % m;
 
 const directionObject = (d: Direction): PointObject => ([
   [0, -1],
@@ -20,6 +16,21 @@ const directionObject = (d: Direction): PointObject => ([
   [0, 1],
   [-1, 0]
 ] as PointObject[])[d];
+
+// Заворачивает упакованную точку p по тору size. Шаг направления уже прибавлен снаружи
+// (через directionPoint), поэтому здесь только распаковка, двойной pmod и упаковка обратно.
+const keepTorus = (p: Point, size: Point): Point => {
+  const [w, h] = pointObject(size);
+  const [x, y] = pointObject(p);
+  return (pmod(y, h) << 10) + pmod(x, w);
+};
+
+const neighbors = (p: Point): [Point, Point, Point, Point] => [
+  p - (1 << 10),
+  p + 1,
+  p + (1 << 10),
+  p - 1
+];
 
 const directionPoint = (d: Direction): number => [
   -1 << 10,
@@ -68,5 +79,6 @@ export {
   directionPoint,
   isOppositeDirection,
   neighbors,
+  keepTorus,
   type Stamp
 };

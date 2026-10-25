@@ -6,7 +6,7 @@ import { toStamp } from '../../../front/model/resultToStamp.ts';
 import { assets } from '../../../front/components/game/assets.ts';
 import { bgColor, fgColor } from '../../../front/components/game/colors.ts';
 import type { ResultDump } from '../../../front/types/result.ts';
-import type { Stamp } from '../../../front/types/stamp.ts';
+import { objectPoint, type Stamp } from '../../../front/types/stamp.ts';
 
 /**
  * Серверный рендер результата в PNG для og:image.
@@ -98,7 +98,7 @@ const buildFrontend = (stamp: Stamp): RenderFrontend => {
     game,
     level: stamp.level,
     labyrinth: stamp.labyrinth,
-    demoHead: [13, 6],
+    demoHead: objectPoint([13, 6]),
     unpausing: 0,
     isPaused: () => true,
   };

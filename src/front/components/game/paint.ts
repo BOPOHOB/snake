@@ -1,28 +1,28 @@
 import { Game } from './game';
 import { assets } from './assets';
 import { bgColor, fgColor } from './colors';
+import { keepTorus, objectPoint, pointObject, type Point, type PointObject } from '../../types/stamp';
 
 const headHeight = 7;
 const borderWidth = 3;
-const fieldSize = Game.fieldSize;
 
 type Transform = [(r: number, c: number) => number, (r: number, c: number) => number];
 
-const inferTransform = ([x1, y1]: number[], [x2, y2]: number[]): Transform => {
+const inferTransformGenerator = (fieldSize: PointObject) => ([x1, y1]: PointObject, [x2, y2]: PointObject): Transform => {
   if (Math.abs(x1 - x2) > 1) {
     console.assert(x1 === 0 || x2 === 0, x1, x2);
     if (x1 === 0) {
-      x1 = Game.fieldSize[0];
+      x1 = fieldSize[0];
     } else {
-      x2 = Game.fieldSize[0];
+      x2 = fieldSize[0];
     }
   }
   if (Math.abs(y1 - y2) > 1) {
     console.assert(y1 === 0 || y2 === 0, y1, y2);
     if (y1 === 0) {
-      y1 = Game.fieldSize[1];
+      y1 = fieldSize[1];
     } else {
-      y2 = Game.fieldSize[1];
+      y2 = fieldSize[1];
     }
   }
   if (x1 === x2) {
@@ -60,7 +60,7 @@ export type RenderFrontend = {
   game: Game | null;
   level: number;
   labyrinth: number;
-  demoHead: number[];
+  demoHead: number;
   unpausing: number;
   isPaused: () => boolean;
   update?: () => void;
@@ -75,6 +75,15 @@ export type PaintContext = {
   scale: (x: number, y: number) => void;
 };
 
+const drawRect = (ctx: PaintContext, [w, h]: PointObject, paintRect: PointObject) => {
+  const scale = Math.min(w / paintRect[0], h / paintRect[1]);
+  ctx.translate(
+    (w - paintRect[0] * scale) / 2,
+    (h - paintRect[1] * scale) / 2,
+  );
+  ctx.scale(scale, scale);
+};
+
 /**
  * Чистая рисовка игрового кадра в любой 2D-контекст (браузерный canvas
  * или серверный @napi-rs/canvas). Не зависит от DOM — изоморфна.
@@ -85,13 +94,9 @@ function paint(
   h: number,
   frontend: RenderFrontend,
 ): void {
-  const paintRect = [
-    fieldSize[0] * 4 + borderWidth * 2,
-    fieldSize[1] * 4 + borderWidth * 2 + headHeight,
-  ];
 
   const paintAsset = (
-    pos: number[],
+    pos: PointObject,
     fragment: number[][],
     transform: Transform = [(_r, c) => c, (r) => r],
   ): void => {
@@ -110,14 +115,15 @@ function paint(
   ctx.fillStyle = bgColor;
   ctx.fillRect(0, 0, w, h);
   ctx.fillStyle = fgColor;
-  const scale = Math.min(w / paintRect[0], h / paintRect[1]);
-  ctx.translate(
-    (w - paintRect[0] * scale) / 2,
-    (h - paintRect[1] * scale) / 2,
-  );
-  ctx.scale(scale, scale);
 
   if (frontend.page !== 'game') {
+    const fieldSize = pointObject(assets.labyrinthSizes.at(0)!);
+    const inferTransform = inferTransformGenerator(fieldSize);
+    const paintRect: PointObject = [
+      fieldSize[0] * 4 + borderWidth * 2,
+      fieldSize[1] * 4 + borderWidth * 2 + headHeight,
+    ];
+    drawRect(ctx, [w, h], paintRect);
     for (const [id, s] of `select ${frontend.page}`.split('').entries()) {
       if (s in assets.symbols) {
         paintAsset([0.25 + id, 0], assets.symbols[s]);
@@ -140,7 +146,7 @@ function paint(
       ctx.restore();
       const demoLength = 9;
       for (let i = 0; i !== demoLength; ++i) {
-        const pos = Game.keepTorus([frontend.demoHead[0] - i, frontend.demoHead[1]]);
+        const pos = pointObject(keepTorus(frontend.demoHead - i, objectPoint(fieldSize)));
         let fragment: keyof typeof assets = 'body';
         if (i === 0) {
           fragment = 'head';
@@ -155,15 +161,15 @@ function paint(
         ctx.save();
         const column = lab % 3;
         const row = Math.floor(lab / 3);
-        const padding = [Game.fieldSize[0] / 6, Game.fieldSize[1] / 6];
-        ctx.translate((Game.fieldSize[0] * 4) / 3 * column, (Game.fieldSize[1] * 4) / 3 * row);
+        const padding = [fieldSize[0] / 6, fieldSize[1] / 6];
+        ctx.translate((fieldSize[0] * 4) / 3 * column, (fieldSize[1] * 4) / 3 * row);
         if (frontend.labyrinth === lab) {
-          ctx.fillRect(0, 0, Game.fieldSize[0] + padding[0] * 2, Game.fieldSize[1] + padding[1] * 2);
+          ctx.fillRect(0, 0, fieldSize[0] + padding[0] * 2, fieldSize[1] + padding[1] * 2);
           ctx.fillStyle = bgColor;
         }
         ctx.translate(padding[0], padding[1]);
-        for (let r = 0; r !== Game.fieldSize[1]; ++r) {
-          for (let c = 0; c !== Game.fieldSize[0]; ++c) {
+        for (let r = 0; r !== fieldSize[1]; ++r) {
+          for (let c = 0; c !== fieldSize[0]; ++c) {
             if (l[r][c]) {
               ctx.fillRect(c, r, 1, 1);
             }
@@ -179,9 +185,18 @@ function paint(
     return;
   }
 
+  const fieldSize = pointObject(assets.labyrinthSizes.at(0)!);
+  const inferTransform = inferTransformGenerator(fieldSize);
+  const paintRect: PointObject = [
+    fieldSize[0] * 4 + borderWidth * 2,
+    fieldSize[1] * 4 + borderWidth * 2 + headHeight,
+  ];
+  drawRect(ctx, [w, h], paintRect);
+
+
   ctx.save();
   ctx.translate(2, 0);
-  for (const [id, num] of ('0000' + game.score).slice(-4).split('').entries()) {
+  for (const [id, num] of ('0000' + game.stamp.score).slice(-4).split('').entries()) {
     paintAsset([id, 0], assets.numbers[Number(num)]);
   }
   if (frontend.isPaused()) {
@@ -190,13 +205,13 @@ function paint(
     }
   }
   ctx.restore();
-  if (typeof game.bug === 'object') {
+  if (game.isBugInGame) {
     ctx.save();
     ctx.translate(fieldSize[0] * 4 + borderWidth * 2, 0);
-    for (const [id, num] of ('0' + game.bug.remind).slice(-2).split('').entries()) {
+    for (const [id, num] of ('0' + game.bugRemind).slice(-2).split('').entries()) {
       paintAsset([-2 + id, 0], assets.numbers[Number(num)]);
     }
-    paintAsset([-4.5, 0], assets.bugs[game.bug.type]);
+    paintAsset([-4.5, 0], assets.bugs[game.bugType!]);
     ctx.restore();
   }
 
@@ -211,11 +226,13 @@ function paint(
   ctx.translate(borderWidth, borderWidth);
 
   const paintBodyFragment = (
-    ctxt: [number[] | null, number[] | null, number[] | null, boolean?],
+    ctxt: [Point | null, Point | null, Point | null, boolean?],
   ): void => {
-    const [prw, cur, nxt, eaten] = ctxt;
+    const [prw, cur, nxt, eaten] = ctxt.map(v => typeof v === 'number' ? pointObject(v) : v) as [
+      PointObject | null, PointObject | null, PointObject | null, boolean?
+    ];
     if (prw === null) {
-      if (cur) paintAsset(cur, assets[game.eatenPredict() ? 'headOpen' : 'head'], inferTransform(nxt as number[], cur));
+      if (cur) paintAsset(cur, assets[game.eatenPredict() ? 'headOpen' : 'head'], inferTransform(nxt!, cur));
     } else if (nxt === null) {
       if (cur) paintAsset(cur, assets.tail, inferTransform(cur, prw));
     } else if (nxt[0] === prw[0] || nxt[1] === prw[1]) {
@@ -229,15 +246,16 @@ function paint(
     paintBodyFragment(ctxt);
   }
   if (Array.isArray(game.apple)) {
-    paintAsset(game.apple, assets.apple);
+    paintAsset(pointObject(game.apple), assets.apple);
   }
 
-  if (typeof game.bug === 'object') {
-    paintAsset([game.bug.pos[0], game.bug.pos[1]], assets.bugs[game.bug.type]);
+  if (game.isBugInGame) {
+    paintAsset(pointObject(game.bug!), assets.bugs[game.bugType!]);
   }
 
-  const labyrinth = assets.labyrinth[game.labyrinth];
-  for (const [col, row] of Game.fields()) {
+  const labyrinth = assets.labyrinth[game.stamp.labyrinth];
+  for (const point of game.fields()) {
+    const [col, row] = pointObject(point);
     if (labyrinth[row][col]) {
       ctx.fillRect(col * 4 + 1, row * 4 + 1, 2, labyrinth[row + 1]?.[col] ? 4 : 2);
       if (labyrinth[row][col + 1]) {
@@ -247,7 +265,7 @@ function paint(
   }
   if (frontend.unpausing && !frontend.isPaused()) {
     ctx.save();
-    ctx.translate((Game.fieldSize[0] / 2) * 4 - 1.5, (Game.fieldSize[1] / 2) * 4 - 2.5);
+    ctx.translate((fieldSize[0] / 2) * 4 - 1.5, (fieldSize[1] / 2) * 4 - 2.5);
     ctx.fillStyle = fgColor;
     ctx.fillRect(-2, -2, 7, 9);
     ctx.fillStyle = bgColor;

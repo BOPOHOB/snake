@@ -70,7 +70,6 @@ class Achievements
     }
     if (typeof localStorage !== 'undefined') {
       for (const stamp of JSON.parse(localStorage.getItem('stamp') ?? '[]')) {
-        console.log(stamp);
         this.accept('finished', stamp.stamp);
       }
     }

@@ -1,4 +1,4 @@
-import { directionPoint, isOppositeDirection, neighbors, objectPoint, pointObject, type Direction, type Point, type Stamp } from '../../types/stamp';
+import { directionPoint, isOppositeDirection, keepTorus, neighbors, objectPoint, pointObject, type Direction, type Point, type Stamp } from '../../types/stamp';
 import { assets } from './assets';
 
 export type GameAchievementEvent = 'win' | 'no bug' | 'score';
@@ -28,21 +28,7 @@ class Game {
   }
 
   keepTorus = (p: Point): Point => {
-    let [x, y] = pointObject(p);
-    const [w, h] = pointObject(this.fieldSize);
-    if (x < 0) {
-      x += w;
-    }
-    if (y < 0) {
-      y += h;
-    }
-    if (x === w) {
-      x = 0;
-    }
-    if (y === h) {
-      y = 0;
-    }
-    return objectPoint([x, y]);
+    return keepTorus(p, this.fieldSize);
   };
 
   gameOver = false;
@@ -87,6 +73,20 @@ class Game {
   get bug(): Point | null {
     if (this.isBugInGame) {
       return this.stamp.bugs.at(-1)!;
+    }
+    return null;
+  }
+
+  get bugRemind(): number | null {
+    if (this.isBugInGame) {
+      return this.stamp.bugTicks.at(-1)! + Game.bugDuration - this.stamp.tick;
+    }
+    return null;
+  }
+
+  get bugType(): number | null {
+    if (this.isBugInGame) {
+      return this.stamp.bugTypes.at(-1)!;
     }
     return null;
   }
@@ -251,6 +251,9 @@ class Game {
       stamp.bugEaten.length = eatenLimit;
     }
 
+    // при воскрешении пока сжегаем муху, потом отладим
+    stamp.bugCountdown = Game.bugFrequency;
+
     this.gameOver = false;
     stamp.retryCounter += 1;
   }
@@ -338,7 +341,7 @@ class Game {
       }
     }
     if (this.isBugInGame) {
-      const remind = Game.bugDuration + stamp.bugTicks.at(-1)! - stamp.tick;
+      const remind = this.bugRemind!;
       if (this.isBug(stamp.head)) {
         stamp.score += (stamp.level + stamp.labyrinth * 3) * (10 + remind);
         stamp.bugCountdown = Game.bugFrequency;

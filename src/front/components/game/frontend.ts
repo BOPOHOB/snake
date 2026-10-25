@@ -1,7 +1,7 @@
 import { Game } from './game';
 import { assets } from './assets';
 import { achievements } from '../../services/achivements/achivements.ts';
-import type { Point } from '../../types/stamp';
+import { keepTorus, objectPoint, type Point } from '../../types/stamp';
 
 class Frontend {
   game: Game | null = null;
@@ -9,7 +9,7 @@ class Frontend {
   labyrinth: number;
   page: 'level' | 'labyrinth' | 'game' = 'level';
   interval: ReturnType<typeof setInterval> | null = null;
-  demoHead: Point = [13, 6];
+  demoHead: Point = objectPoint([13, 6]);
   unpausing = 0;
   update?: () => void;
   #onGameOver: Array<(game: Game) => void> = [];
@@ -29,15 +29,15 @@ class Frontend {
     localStorage.setItem('level', String(value));
     if (this.interval) clearInterval(this.interval);
     this.interval = setInterval(() => {
-      this.demoHead[0] += 1;
-      Game.keepTorus(this.demoHead);
+      this.demoHead += 1;
+      keepTorus(this.demoHead, assets.labyrinthSizes[0]);
       this.update?.();
     }, Game.tickDurations[this.level]);
   }
 
   startGame(): void {
     this.attachGame(new Game(this.level, this.labyrinth));
-    achievements.accept('started', this.game!);
+    achievements.accept('started', this.game!.stamp);
     this.onResume(0);
   }
 
@@ -45,7 +45,7 @@ class Frontend {
   /** onAchievement, onGameOver → #onGameOver, очистка interval по game over. */
   attachGame(game: Game): void {
     this.game = game;
-    game.onAchievement = (type, g) => achievements.accept(type, g);
+    game.onAchievement = (type, g) => achievements.accept(type, game.stamp);
     game.onGameOver.push(() => {
       this.#onGameOver.forEach((callback) => callback(this.game!));
       if (this.interval) clearInterval(this.interval);
