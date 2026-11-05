@@ -2,7 +2,18 @@ type Point = number;
 type PointObject = [number, number];
 
 const objectPoint = ([x, y]: PointObject): number => (y << 10) + x;
-const pointObject = (p: number): PointObject => [p & ((1 << 10) - 1), p >> 10];
+// Распаковка с детекцией перекрёстного заёма: при p-1 с x=0 упаковка даёт x=1023, y-1.
+// Если x > 512 — это заём, восстанавливаем: x -= 1024 (→ -1), y += 1 (вернуть заём из y).
+// Для валидных точек (x < W <= 512) восстановление не срабатывает.
+const pointObject = (p: number): PointObject => {
+  let x = p & ((1 << 10) - 1);
+  let y = p >> 10;
+  if (x > (1 << 9)) {
+    x -= 1 << 10;
+    y += 1;
+  }
+  return [x, y];
+};
 
 // top, right, bottom, top всё как в css, но массив выдавать слишком расточительно. Теперь enum
 type Direction = 0 | 1 | 2 | 3;

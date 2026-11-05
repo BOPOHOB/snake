@@ -4,7 +4,7 @@ import { assets } from './assets';
 export type GameAchievementEvent = 'win' | 'no bug' | 'score';
 
 class Game {
-  static readonly defaultDirection: Direction = 2;
+  static readonly defaultDirection: Direction = 1;
   static readonly initialSnakeLength = 6;
   static readonly bugFrequency = 5;
   static readonly bugDuration = 20;
@@ -40,7 +40,7 @@ class Game {
   constructor(level?: number, labyrinth?: number) {
     this.stamp = {
       score: 0,
-      head: 0,
+      head: assets.labyrinthHeads[labyrinth ?? 1],
       tick: 0,
       level: level ?? 1,
       labyrinth: labyrinth ?? 1,
@@ -114,7 +114,9 @@ class Game {
       this.onAchievement?.('win', this);
       return;
     }
-    this.stamp.apples.push(result[Math.floor(Math.random() * result.length)]);
+    const { stamp } = this;
+    stamp.apples.push(result[Math.floor(Math.random() * result.length)]);
+    stamp.appleTicks.push(stamp.tick);
   }
 
   randomBugPosition(): Point | null {
@@ -179,22 +181,23 @@ class Game {
     let bugCur = stamp.bugEaten.length - 1;
     const snakeLength = stamp.apples.length + Game.initialSnakeLength;
     while (idx < snakeLength) {
-      while (bandIdx >= 0 && stamp.bandTicks[bandIdx] >= stamp.tick - idx) {
+      const backwardTick = stamp.tick - idx;
+      while (bandIdx >= 0 && stamp.bandTicks[bandIdx] >= backwardTick) {
         --bandIdx;
       }
-      if (stamp.appleTicks[appleCur] === stamp.tick - idx) {
+      if (stamp.appleTicks[appleCur] === backwardTick) {
         appleCur -= 1;
       }
       const direction = stamp.bands[bandIdx] ?? Game.defaultDirection;
       if (prwPos !== null) {
-        yield [prwPos2, prwPos, pos, stamp.apples[appleCur] === prwPos || stamp.bugEaten[bugCur] === stamp.tick - idx];
+        yield [prwPos2, prwPos, pos, stamp.apples[appleCur] === prwPos || stamp.bugEaten[bugCur] === backwardTick];
       }
-      if (stamp.bugEaten[bugCur] === stamp.tick - idx) {
+      if (stamp.bugEaten[bugCur] === backwardTick) {
         bugCur -= 1;
       }
       prwPos2 = prwPos;
       prwPos = pos;
-      pos = this.keepTorus(pos + direction);
+      pos = this.keepTorus(pos - directionPoint(direction));
       ++idx;
     }
     yield [prwPos2, prwPos, null];
@@ -344,6 +347,7 @@ class Game {
       const remind = this.bugRemind!;
       if (this.isBug(stamp.head)) {
         stamp.score += (stamp.level + stamp.labyrinth * 3) * (10 + remind);
+        stamp.bugEaten.push(stamp.tick - 1);
         stamp.bugCountdown = Game.bugFrequency;
       } else {
         if (remind === 0) {

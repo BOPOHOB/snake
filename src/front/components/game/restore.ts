@@ -7,16 +7,7 @@ import type { Stamp } from '../../types/stamp';
  */
 function restoreGameFromStamp(stamp: Stamp): Game {
   const game = new Game(stamp.level, stamp.labyrinth);
-  game.score = stamp.score;
-  game.bands = stamp.bands;
-  game.head = stamp.head;
-  game.eatens = new Set(stamp.eatens);
-  game.tickId = stamp.tickId;
-  game.apple = stamp.apple;
-  game.bug = stamp.bug;
-  game.retryCounter = stamp.retryCounter ?? 0;
-  game.isWin = stamp.isWin;
-  game.gameOver = true;
+  game.stamp = stamp;
   return game;
 }
 

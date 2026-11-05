@@ -245,7 +245,7 @@ function paint(
   for (const ctxt of game.body()) {
     paintBodyFragment(ctxt);
   }
-  if (Array.isArray(game.apple)) {
+  if (game.apple !== null) {
     paintAsset(pointObject(game.apple), assets.apple);
   }
 

@@ -22,7 +22,7 @@ export const Home = () => {
     frontend.setLevel(Number(localStorage.getItem('level') ?? 3));
 
     return frontend.onGameOver((game) => {
-      stampsRef.current.add(game.stamp());
+      stampsRef.current.add(game.stamp);
       navigateRef.current('/result', { state: { justFinished: true } });
     });
   }, [frontend]);
