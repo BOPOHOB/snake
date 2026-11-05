@@ -29,6 +29,7 @@ export type ResultRow = {
 export type ResultDump = Stamp & {
   id: number;
   user_id: number;
+  user_name: string;
   created_at: number;
 };
 
@@ -55,6 +56,9 @@ export function mapResult(
   db: Db,
   row: ResultRow,
 ): ResultDump {
+  const u = db
+    .prepare(`SELECT name FROM "user" WHERE id = ?`)
+    .get(row.user_id) as { name: string } | undefined;
   const stamp: Stamp = {
     score: row.score,
     head: row.head as Point,
@@ -77,6 +81,7 @@ export function mapResult(
     ...stamp,
     id: row.id,
     user_id: row.user_id,
+    user_name: u?.name ?? '',
     created_at: row.created_at,
   };
 }

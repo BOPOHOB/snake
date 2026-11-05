@@ -4,6 +4,7 @@ import type { Stamp } from './stamp';
 export type ResultDump = Stamp & {
   id: number;
   user_id: number;
+  user_name: string;
   created_at: number;
 };
 

@@ -93,13 +93,13 @@ const routes: RouteObject[] = [
                 };
                 if (!r) return base;
                 return {
-                  title: `Score ${r.score} — Nokia 3310 Snake 2`,
+                  title: `${r.user_name} — ${r.score} — Nokia 3310 Snake 2`,
                   description: `Result: score ${r.score}, level ${r.level}, length ${r.apples.length + Game.initialSnakeLength}${r.isWin ? ' — победа' : ''}.`,
                   ogUrl: id ? `https://snake3310.io/result/${id}` : undefined,
                   ogImage: id ? `https://snake3310.io/og/result/${id}.png` : undefined,
                   ogImageWidth: 1664,
                   ogImageHeight: 686,
-                  ogImageAlt: `Result: score ${r.score}`,
+                  ogImageAlt: `${r.user_name} result: score ${r.score}`,
                 };
               },
             },

@@ -43,7 +43,7 @@ const Row = ({
       return (
         <Fragment key={labyrinth}>
           <td className={current}>
-            <Link to={`/result/${result.id}`}>
+            <Link to={`/result/${result.id}`} title={result.user_name || 'Аноним'}>
               {score}
             </Link>
           </td>

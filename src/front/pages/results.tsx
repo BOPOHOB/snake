@@ -89,7 +89,7 @@ export const Results = () => {
   } else if (loaded?.result) {
     stamp = loaded.result;
     position = loaded.position;
-    userName = user?.name ?? null;
+    userName = loaded.result.user_name || null;
   } else if (id && !loaded?.result) {
     return (
       <>
