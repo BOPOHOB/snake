@@ -39,14 +39,18 @@ export async function apiFetch<T>(
   return data as T;
 }
 
+/** null results = бекенд не ответил (фолбэк модели на локальные данные). */
 export async function loadResults(
   args: LoaderFunctionArgs,
-  limit = 1000,
-): Promise<{ results: ResultDump[] }> {
-  return apiFetch<{ results: ResultDump[] }>(
-    args.request,
-    `/api/results?limit=${limit}`,
-  );
+): Promise<{ results: ResultDump[] | null }> {
+  try {
+    return await apiFetch<{ results: ResultDump[] }>(
+      args.request,
+      '/api/results',
+    );
+  } catch {
+    return { results: null };
+  }
 }
 
 export async function loadResult(

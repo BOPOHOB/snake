@@ -40,12 +40,23 @@ const Row = ({
       }
       const { length, score, level, retry, result } = lvl[resultPos];
       const current = selectedId === result.id ? cn.current : '';
+      const isLocal = result.id < 0;
       return (
         <Fragment key={labyrinth}>
           <td className={current}>
-            <Link to={`/result/${result.id}`} title={result.user_name || 'Аноним'}>
-              {score}
-            </Link>
+            {isLocal ? (
+              <Link
+                to="/result"
+                state={{ stamp: result, userName: result.user_name }}
+                title={`${result.user_name || 'Аноним'} (локальный)`}
+              >
+                {score}
+              </Link>
+            ) : (
+              <Link to={`/result/${result.id}`} title={result.user_name || 'Аноним'}>
+                {score}
+              </Link>
+            )}
           </td>
           <td className={current}>{length}</td>
           <td className={current}>{retry}</td>

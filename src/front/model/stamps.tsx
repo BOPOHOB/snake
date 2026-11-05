@@ -84,6 +84,14 @@ class Stamps {
     return this.#entries.at(-1) ?? null;
   }
 
+  entries(): StampEntry[] {
+    return this.#entries;
+  }
+
+  unsentEntries(): StampEntry[] {
+    return this.#entries.filter((e) => !e.sent);
+  }
+
   unsentCount(): number {
     return this.#entries.filter((e) => !e.sent).length;
   }

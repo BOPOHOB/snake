@@ -2,10 +2,8 @@ import type { MenuProps } from 'antd';
 import { Button, Menu } from 'antd';
 import type { MenuClickEventHandler } from 'rc-menu/lib/interface';
 import { useCallback, useMemo, type FC, type PropsWithChildren } from 'react';
-import { useLocation, useNavigate, useParams, useRouteLoaderData } from 'react-router-dom';
-import { Results } from '../components/results/Results';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useSession, useSessionState } from '../model/session';
-import type { ResultDump } from '../types/result';
 
 import cn from './outline.module.less';
 
@@ -54,11 +52,8 @@ const AuthPanel: FC = () => {
 const Outline: FC<PropsWithChildren> = ({ children }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { id } = useParams();
-  const resultsData = useRouteLoaderData('results') as { results: ResultDump[] } | undefined;
 
   const onResults = pathname === '/result' || pathname.startsWith('/result/');
-  const selectedId = id && /^\d+$/.test(id) ? Number(id) : undefined;
 
   const onClick: MenuClickEventHandler = useCallback(({ key }) => {
     navigate(key === '' ? '/' : `/${key}`);
@@ -79,9 +74,6 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
         </nav>
         <AuthPanel />
       </header>
-      {onResults && resultsData && (
-        <Results results={resultsData.results} selectedId={selectedId} />
-      )}
       {children}
     </main>
   );

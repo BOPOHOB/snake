@@ -48,7 +48,7 @@ export function createApp(db: Db, options: CreateAppOptions = {}) {
   );
 
   app.route('/api/auth', authRoutes(authConfig, db));
-  app.route('/api/results', resultsRoutes(db));
+  app.route('/api/results', resultsRoutes(db, authConfig));
   app.route('/api/result', resultRoutes(db, authConfig));
 
   // og:image для карточки результата: /og/result/<id>.png

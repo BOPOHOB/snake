@@ -62,8 +62,8 @@ export function authLogout(): Promise<{ ok: true }> {
   return request<{ ok: true }>('/api/auth/logout', { method: 'POST' });
 }
 
-export function getResults(limit = 1000): Promise<{ results: ResultDump[] }> {
-  return request<{ results: ResultDump[] }>(`/api/results?limit=${limit}`);
+export function getResults(): Promise<{ results: ResultDump[] }> {
+  return request<{ results: ResultDump[] }>('/api/results');
 }
 
 export function getResultPosition(
