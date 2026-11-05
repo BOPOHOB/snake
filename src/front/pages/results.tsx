@@ -222,6 +222,7 @@ export const Results = () => {
   }, [focusKey, stamps, serverResults, userName]);
 
   useEffect(() => {
+    model?.enableLocal();
     return () => {
       model?.destructor();
     };

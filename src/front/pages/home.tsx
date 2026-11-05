@@ -18,8 +18,11 @@ export const Home = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Семантика старого pages/game.jsx: уровень по умолчанию = 3.
-    frontend.setLevel(Number(localStorage.getItem('level') ?? 3));
+    // localStorage только после mount (гидрация). Дефолт уровня как раньше — 3.
+    const level = Number(localStorage.getItem('level') ?? 3);
+    const labyrinth = Number(localStorage.getItem('labyrinth') ?? 1);
+    frontend.labyrinth = Number.isFinite(labyrinth) ? labyrinth : 1;
+    frontend.setLevel(Number.isFinite(level) ? level : 3);
 
     return frontend.onGameOver((game) => {
       stampsRef.current.add(game.stamp);

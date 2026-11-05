@@ -1,4 +1,4 @@
-import { createContext, useContext, useSyncExternalStore, type FC, type PropsWithChildren } from 'react';
+import { createContext, useContext, useEffect, useSyncExternalStore, type FC, type PropsWithChildren } from 'react';
 import type { Stamp } from '../types/stamp';
 import type { PositionResponse } from '../types/position';
 import { addResult } from '../services/api';
@@ -49,10 +49,16 @@ class Stamps {
   #syncing = false;
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      this.#entries = readEntries();
-      this.#rebuild();
-    }
+    // Не читаем localStorage здесь: на клиенте constructor срабатывает
+    // при гидрации заново (renderToString не переносит useState) → #418.
+    // Данные поднимаем в loadFromStorage() после mount.
+  }
+
+  /** После mount / при создании инстанса в браузере. */
+  loadFromStorage(): void {
+    if (typeof localStorage === 'undefined') return;
+    this.#entries = readEntries();
+    this.#rebuild();
   }
 
   subscribe = (cb: () => void): (() => void) => {
@@ -135,6 +141,9 @@ class Stamps {
 const StampsContext = createContext<Stamps | null>(null);
 const StampsProvider: FC<PropsWithChildren> = ({ children }) => {
   const stamps = useModel(() => new Stamps(), []);
+  useEffect(() => {
+    stamps.loadFromStorage();
+  }, [stamps]);
   return <StampsContext.Provider value={stamps}>{children}</StampsContext.Provider>;
 };
 

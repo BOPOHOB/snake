@@ -68,10 +68,22 @@ class Achievements
     for (const achievement of this.resurrected) {
       achievement.isResurrected = true;
     }
-    if (typeof localStorage !== 'undefined') {
-      for (const stamp of JSON.parse(localStorage.getItem('stamp') ?? '[]')) {
-        this.accept('finished', stamp.stamp);
+  }
+
+  /** Переигровка stamp'ов из localStorage — только после mount (не в constructor). */
+  hydrateFromStorage(): void {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      const raw = JSON.parse(localStorage.getItem('stamp') ?? '[]');
+      if (!Array.isArray(raw)) return;
+      for (const item of raw) {
+        const stamp = item && typeof item === 'object' && 'stamp' in item
+          ? item.stamp
+          : item;
+        if (stamp) this.accept('finished', stamp);
       }
+    } catch {
+      /* ignore broken storage */
     }
   }
 }

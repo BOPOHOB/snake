@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { BitScene } from '../elements/BitScene';
 import classNames from 'classnames';
 import cn from './achievements.module.less';
@@ -38,12 +39,21 @@ const Achievement = ({ achivement }: { achivement: AchievementLike }) => {
   );
 };
 
-const Achievements = () => (
-  <ul className={cn.wrap}>
-    {[...achievements.results()].map((achivement, id) => (
-      <Achievement key={id} achivement={achivement as AchievementLike} />
-    ))}
-  </ul>
-);
+const Achievements = () => {
+  // Первый кадр совпадает с SSR (без localStorage); после mount — переигровка stamp'ов.
+  const [, setHydrated] = useState(0);
+  useEffect(() => {
+    achievements.hydrateFromStorage();
+    setHydrated((n) => n + 1);
+  }, []);
+
+  return (
+    <ul className={cn.wrap}>
+      {[...achievements.results()].map((achivement, id) => (
+        <Achievement key={id} achivement={achivement as AchievementLike} />
+      ))}
+    </ul>
+  );
+};
 
 export { Achievements };

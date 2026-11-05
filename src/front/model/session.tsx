@@ -19,11 +19,10 @@ class Session {
   #didInit = false;
 
   constructor() {
+    // isLoading=true и на SSR, и на первом клиентском кадре — иначе AuthPanel
+    // (кнопки vs null) даёт hydration mismatch #418.
     if (typeof window !== 'undefined') {
       void this.loadMe();
-    } else {
-      this.#isLoading = false;
-      this.#rebuild();
     }
   }
 

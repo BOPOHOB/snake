@@ -15,13 +15,9 @@ class Frontend {
   #onGameOver: Array<(game: Game) => void> = [];
 
   constructor() {
-    if (typeof localStorage !== 'undefined') {
-      this.level = Number(localStorage.getItem('level') ?? 1);
-      this.labyrinth = Number(localStorage.getItem('labyrinth') ?? 1);
-    } else {
-      this.level = 1;
-      this.labyrinth = 1;
-    }
+    // Дефолты без localStorage — иначе SSR (level=1) ≠ гидрация (level из LS) → #418.
+    this.level = 1;
+    this.labyrinth = 1;
   }
 
   setLevel(value: number): void {

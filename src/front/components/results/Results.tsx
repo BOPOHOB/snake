@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BitScene } from '../elements/BitScene';
 import { assets } from '../game/assets';
@@ -74,9 +74,12 @@ type ResultsProps = {
 
 /** Таблица результатов по лабиринтам (страница /result и /result/:id). */
 const Results = ({ results, selectedId }: ResultsProps) => {
-  const [orderBy, setOrderBy] = useState<OrderKey>(
-    () => (localStorage.getItem('order') as OrderKey) || 'score',
-  );
+  // Дефолт одинаков на SSR и при гидрации; localStorage — только после mount.
+  const [orderBy, setOrderBy] = useState<OrderKey>('score');
+  useEffect(() => {
+    const raw = localStorage.getItem('order');
+    if (raw === 'score' || raw === 'length') setOrderBy(raw);
+  }, []);
 
   const levels = useMemo(() => {
     const buckets: Entry[][] = Array.from({ length: LABYRINTH_COUNT }, () => []);
