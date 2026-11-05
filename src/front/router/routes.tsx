@@ -77,6 +77,7 @@ const routes: RouteObject[] = [
         children: [
           {
             index: true,
+            Component: () => null,
           },
           {
             id: 'result',

@@ -6,12 +6,20 @@ import { AppProviders } from './appProviders';
 import { routes } from './router/routes';
 import './style/main.less';
 
-const router = createBrowserRouter(routes);
+const router = createBrowserRouter(routes, {
+  future: {
+    v7_relativeSplatPath: true,
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_skipActionErrorRevalidation: true,
+  },
+});
 
 const app = (
   <StrictMode>
     <AppProviders>
-      <RouterProvider router={router} />
+      <RouterProvider router={router} future={{ v7_startTransition: true }} />
     </AppProviders>
   </StrictMode>
 );

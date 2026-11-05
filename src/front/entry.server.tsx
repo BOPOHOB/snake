@@ -17,7 +17,12 @@ async function renderToHtml(request: Request, template: string): Promise<Respons
     return context;
   }
 
-  const router = createStaticRouter(dataRoutes, context);
+  const router = createStaticRouter(dataRoutes, context, {
+    future: {
+      v7_relativeSplatPath: true,
+      v7_partialHydration: true,
+    },
+  });
   const appHtml = renderToString(
     <StrictMode>
       <AppProviders>

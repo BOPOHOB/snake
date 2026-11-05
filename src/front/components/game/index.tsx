@@ -67,9 +67,8 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
 
     window.addEventListener('resize', onResize, true);
     canvas.addEventListener('blur', onBlur);
-    canvas.contentEditable = 'true';
-    canvas.focus();
     canvas.addEventListener('keydown', onKeyDown);
+    canvas.focus();
     render.current();
 
     return () => {
@@ -87,9 +86,10 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
     <canvas
       className={cn.scene}
       ref={ref}
-      contentEditable
-      width={100}
-      height={100}
+      tabIndex={0}
+      role="img"
+      aria-label="Snake 2 game field"
+      onClick={() => ref.current?.focus()}
     />
   );
 };

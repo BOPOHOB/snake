@@ -29,8 +29,7 @@ class Frontend {
     localStorage.setItem('level', String(value));
     if (this.interval) clearInterval(this.interval);
     this.interval = setInterval(() => {
-      this.demoHead += 1;
-      keepTorus(this.demoHead, assets.labyrinthSizes[0]);
+      this.demoHead = keepTorus(this.demoHead + 1, assets.labyrinthSizes[0]);
       this.update?.();
     }, Game.tickDurations[this.level]);
   }
