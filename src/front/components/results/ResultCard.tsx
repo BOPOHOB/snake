@@ -14,7 +14,7 @@ type ResultCardProps = {
 /** Карточка одного результата — одна и та же для локального stamp и /result/:id. */
 const ResultCard = ({ stamp, userName, position }: ResultCardProps) => {
   const navigate = useNavigate();
-  const canResurrect = (stamp.eatens?.length ?? 0) >= 10;
+  const canResurrect = stamp.apples.length >= 4;
 
   const onStart = () => navigate('/');
   const onResurrect = () => {

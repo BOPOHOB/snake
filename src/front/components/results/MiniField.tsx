@@ -5,6 +5,7 @@ import { bindRender } from '../game/render';
 import type { RenderFrontend } from '../game/render';
 import { restoreGameFromStamp } from '../game/restore';
 import type { Stamp } from '../../types/stamp';
+import { objectPoint } from '../../types/stamp';
 import cn from './miniField.module.less';
 
 const buildFrontend = (stamp: Stamp): RenderFrontend => {
@@ -14,7 +15,7 @@ const buildFrontend = (stamp: Stamp): RenderFrontend => {
     game,
     level: stamp.level,
     labyrinth: stamp.labyrinth,
-    demoHead: [13, 6],
+    demoHead: objectPoint([13, 6]),
     unpausing: 0,
     isPaused: () => true,
   };

@@ -19,35 +19,9 @@ export function resolveDbPath(): string {
 
 export type Db = DatabaseSync;
 
+/** Открывает базу. Схему не создаёт — изменения вносятся полной очисткой базы (удалением файла). */
 export function openDb(dbPath = resolveDbPath()): Db {
   const db = new DatabaseSync(dbPath);
   db.exec('PRAGMA foreign_keys = ON;');
-  migrate(db);
   return db;
-}
-
-/**
- * Неразрушающие миграции: индексы и UNIQUE-ограничение на user.
- * Сама схема (таблицы user/result) уже создана в db.db вручную.
- */
-function migrate(db: Db): void {
-  db.exec(`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_user_vendor_code
-      ON "user" (auth_vendor, auth_code);
-  `);
-  db.exec(`
-    CREATE INDEX IF NOT EXISTS idx_result_score
-      ON result (score DESC);
-  `);
-  db.exec(`
-    CREATE INDEX IF NOT EXISTS idx_result_lab_level_score
-      ON result (labyrinth, level, score DESC);
-  `);
-  // created_at (unix seconds) — время постановки результата. Добавлено позже,
-  // поэтому guard: если колонки нет — добавляем и бэкфиллим существующие строки.
-  const cols = db.prepare(`PRAGMA table_info(result)`).all() as { name: string }[];
-  if (!cols.some((c) => c.name === 'created_at')) {
-    const now = Math.floor(Date.now() / 1000);
-    db.exec(`ALTER TABLE result ADD COLUMN created_at INTEGER NOT NULL DEFAULT ${now};`);
-  }
 }

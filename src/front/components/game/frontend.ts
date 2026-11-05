@@ -45,7 +45,7 @@ class Frontend {
   /** onAchievement, onGameOver → #onGameOver, очистка interval по game over. */
   attachGame(game: Game): void {
     this.game = game;
-    game.onAchievement = (type, g) => achievements.accept(type, game.stamp);
+    game.onAchievement = (type) => achievements.accept(type, game.stamp);
     game.onGameOver.push(() => {
       this.#onGameOver.forEach((callback) => callback(this.game!));
       if (this.interval) clearInterval(this.interval);

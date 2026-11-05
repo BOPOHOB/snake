@@ -4,8 +4,7 @@ import type { AuthConfig } from '../auth/config.ts';
 import { resolveAuthUser } from '../auth/session.ts';
 import {
   computePosition,
-  encodeBlob,
-  encodeText,
+  encodeArray,
   mapResult,
   parseAddBody,
   selectResultColumns,
@@ -63,25 +62,39 @@ export function resultRoutes(db: Db, authConfig: AuthConfig | null) {
       return c.json({ error: parsed }, 400);
     }
 
-    const info = db.prepare(`
-      INSERT INTO result (
-        user_id, score, bands, eatens, tick_id, level, labyrinth,
-        apple, bug, retryCounter, isWin, created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      user.id,
-      parsed.score,
-      encodeBlob(parsed.bands),
-      encodeBlob(parsed.eatens),
-      parsed.tick_id,
-      parsed.level,
-      parsed.labyrinth,
-      encodeText(parsed.apple),
-      encodeText(parsed.bug),
-      parsed.retryCounter,
-      parsed.isWin ? 1 : 0,
-      Math.floor(Date.now() / 1000),
-    );
+    const info = (() => {
+      try {
+        return db.prepare(`
+          INSERT INTO result (
+            user_id, score, head, tick, level, labyrinth, retry_counter, is_win,
+            bands, band_ticks, apples, apple_ticks, bugs, bug_ticks, bug_types, bug_eaten, bug_countdown,
+            created_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `).run(
+          user.id,
+          parsed.score,
+          parsed.head,
+          parsed.tick,
+          parsed.level,
+          parsed.labyrinth,
+          parsed.retryCounter,
+          parsed.isWin ? 1 : 0,
+          encodeArray(parsed.bands),
+          encodeArray(parsed.bandTicks),
+          encodeArray(parsed.apples),
+          encodeArray(parsed.appleTicks),
+          encodeArray(parsed.bugs),
+          encodeArray(parsed.bugTicks),
+          encodeArray(parsed.bugTypes),
+          encodeArray(parsed.bugEaten),
+          parsed.bugCountdown,
+          Math.floor(Date.now() / 1000),
+        );
+      } catch (err) {
+        console.error('INSERT result failed:', err);
+        throw err;
+      }
+    })();
 
     const id = Number(info.lastInsertRowid);
     return c.json({ ...computePosition(db, parsed.level, parsed.labyrinth, parsed.score, id), id });

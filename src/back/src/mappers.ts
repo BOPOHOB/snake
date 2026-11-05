@@ -1,200 +1,130 @@
 import type { Db } from './db.ts';
+import type { Stamp, Direction, Point } from '../../front/types/stamp.ts';
 
-/** Строка result из БД (сырая). */
+/** Строка result из БД (сырая). Массивы — JSON-строки, скаляры — числа. */
 export type ResultRow = {
   id: number;
   user_id: number;
   score: number;
-  bands: Uint8Array;
-  eatens: Uint8Array;
-  tick_id: number;
+  head: number;
+  tick: number;
   level: number;
   labyrinth: number;
-  apple: string;
-  bug: string;
-  retryCounter: number;
-  isWin: number;
+  retry_counter: number;
+  is_win: number;
+  bands: string;
+  band_ticks: string;
+  apples: string;
+  apple_ticks: string;
+  bugs: string;
+  bug_ticks: string;
+  bug_types: string;
+  bug_eaten: string;
+  bug_countdown: number;
   created_at: number;
 };
 
-/** Полный дамп результата (для /api/results и /api/result/:id). */
-export type ResultDump = {
+/** Полный дамп результата (для /api/results и /api/result/:id). Расширяет Stamp
+ *  серверными полями — без вложенности и дублирования. */
+export type ResultDump = Stamp & {
   id: number;
   user_id: number;
-  user_name: string;
-  score: number;
-  bands: unknown;
-  eatens: unknown;
-  tick_id: number;
-  level: number;
-  labyrinth: number;
-  apple: unknown;
-  bug: unknown;
-  retryCounter: number;
-  isWin: boolean;
-  head: number[];
   created_at: number;
 };
 
-const FIELD_W = 20;
-const FIELD_H = 9;
-const LABYRINTH_HEADS: number[][] = [
-  [6, 4],
-  [12, 4],
-  [6, 4],
-  [6, 5],
-  [10, 7],
-  [6, 4],
-];
-
-type Band = { tickId: number; direction: [number, number] };
-
-/** Вычисляет head из bands + стартовой позиции лабиринта (без хранения в БД). */
-export function computeHead(bandsRaw: unknown, labyrinth: number, tickId: number): number[] {
-  const bands = (Array.isArray(bandsRaw) ? bandsRaw : []) as Band[];
-  let head = [...LABYRINTH_HEADS[labyrinth] ?? [0, 0]];
-  for (let t = 0; t < tickId; t++) {
-    let dir: [number, number] = [1, 0];
-    for (let b = bands.length - 1; b >= 0; b--) {
-      if (bands[b].tickId <= t) {
-        dir = bands[b].direction;
-        break;
-      }
-    }
-    head = [head[0] + dir[0], head[1] + dir[1]];
-    if (head[0] < 0) head[0] += FIELD_W;
-    if (head[1] < 0) head[1] += FIELD_H;
-    if (head[0] === FIELD_W) head[0] = 0;
-    if (head[1] === FIELD_H) head[1] = 0;
-  }
-  return head;
-}
-
 const RESULT_COLUMNS = `
-  id, user_id, score, bands, eatens, tick_id, level, labyrinth, apple, bug, retryCounter, isWin, created_at
+  id, user_id, score, head, tick, level, labyrinth, retry_counter, is_win,
+  bands, band_ticks, apples, apple_ticks, bugs, bug_ticks, bug_types, bug_eaten, bug_countdown,
+  created_at
 `;
 
 export function selectResultColumns(): string {
   return RESULT_COLUMNS;
 }
 
-export function decodeBlob(blob: Uint8Array): unknown {
-  const text = new TextDecoder().decode(blob);
+function decodeArray<T>(text: string): T[] {
   try {
-    return JSON.parse(text);
+    const v = JSON.parse(text);
+    return Array.isArray(v) ? v as T[] : [];
   } catch {
-    return null;
-  }
-}
-
-function decodeJson(text: string): unknown {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
+    return [];
   }
 }
 
 export function mapResult(
   db: Db,
   row: ResultRow,
-  userName?: string,
 ): ResultDump {
-  let name = userName;
-  if (name === undefined) {
-    const u = db
-      .prepare(`SELECT name FROM "user" WHERE id = ?`)
-      .get(row.user_id) as { name: string } | undefined;
-    name = u?.name ?? '';
-  }
-  return {
-    id: row.id,
-    user_id: row.user_id,
-    user_name: name,
+  const stamp: Stamp = {
     score: row.score,
-    bands: decodeBlob(row.bands),
-    eatens: decodeBlob(row.eatens),
-    tick_id: row.tick_id,
+    head: row.head as Point,
+    tick: row.tick,
     level: row.level,
     labyrinth: row.labyrinth,
-    apple: decodeJson(row.apple),
-    bug: decodeJson(row.bug),
-    retryCounter: row.retryCounter,
-    isWin: Boolean(row.isWin),
-    head: computeHead(decodeBlob(row.bands), row.labyrinth, row.tick_id),
+    retryCounter: row.retry_counter,
+    isWin: Boolean(row.is_win),
+    bands: decodeArray<Direction>(row.bands),
+    bandTicks: decodeArray<number>(row.band_ticks),
+    apples: decodeArray<Point>(row.apples),
+    appleTicks: decodeArray<number>(row.apple_ticks),
+    bugs: decodeArray<Point>(row.bugs),
+    bugTicks: decodeArray<number>(row.bug_ticks),
+    bugTypes: decodeArray<number>(row.bug_types),
+    bugEaten: decodeArray<number>(row.bug_eaten),
+    bugCountdown: row.bug_countdown,
+  };
+  return {
+    ...stamp,
+    id: row.id,
+    user_id: row.user_id,
     created_at: row.created_at,
   };
 }
 
-/** Тело POST /api/result/add — полный дамп результата без id. */
-export type AddResultBody = {
-  score: number;
-  bands: unknown;
-  eatens: unknown;
-  tick_id: number;
-  level: number;
-  labyrinth: number;
-  apple: unknown;
-  bug: unknown;
-  retryCounter: number;
-  isWin: boolean;
-};
-
-export function parseAddBody(body: unknown): AddResultBody | string {
+/** Валидирует Stamp-объект и возвращает его либо строку ошибки. */
+export function parseAddBody(body: unknown): Stamp | string {
   if (typeof body !== 'object' || body === null) {
     return 'Invalid JSON body';
   }
-  const raw = body as Record<string, unknown>;
+  const s = body as Record<string, unknown>;
 
-  const score = Number(raw.score);
-  if (!Number.isInteger(score) || score < 0) return 'Invalid score';
+  const score = Number(s.score);
+  if (!Number.isInteger(score) || score < 0) return 'Invalid stamp.score';
 
-  const tick_id = Number(raw.tick_id);
-  if (!Number.isInteger(tick_id) || tick_id < 0) return 'Invalid tick_id';
+  const head = Number(s.head);
+  if (!Number.isInteger(head) || head < 0) return 'Invalid stamp.head';
 
-  const level = Number(raw.level);
-  if (!Number.isInteger(level) || level < 0 || level > 15) return 'Invalid level';
+  const tick = Number(s.tick);
+  if (!Number.isInteger(tick) || tick < 0) return 'Invalid stamp.tick';
 
-  const labyrinth = Number(raw.labyrinth);
+  const level = Number(s.level);
+  if (!Number.isInteger(level) || level < 0 || level > 15) return 'Invalid stamp.level';
+
+  const labyrinth = Number(s.labyrinth);
   if (!Number.isInteger(labyrinth) || labyrinth < 0 || labyrinth > 5) {
-    return 'Invalid labyrinth';
+    return 'Invalid stamp.labyrinth';
   }
 
-  const retryCounter = Number(raw.retryCounter);
+  const retryCounter = Number(s.retryCounter);
   if (!Number.isInteger(retryCounter) || retryCounter < 0) {
-    return 'Invalid retryCounter';
+    return 'Invalid stamp.retryCounter';
   }
 
-  if (typeof raw.isWin !== 'boolean') return 'Invalid isWin';
+  if (typeof s.isWin !== 'boolean') return 'Invalid stamp.isWin';
 
-  // bands/eatens/apple/bug — сериализуем в JSON; валидируем только что они есть.
-  if (raw.bands === undefined || raw.bands === null) return 'Invalid bands';
-  if (raw.eatens === undefined || raw.eatens === null) return 'Invalid eatens';
-  if (raw.apple === undefined || raw.apple === null) {
-    // apple может быть null (выигрыш) — ок, но должен быть передан явно
-  }
-  if (raw.bug === undefined || raw.bug === null) return 'Invalid bug';
+  const bugCountdown = Number(s.bugCountdown);
+  if (!Number.isInteger(bugCountdown) || bugCountdown < 0) return 'Invalid stamp.bugCountdown';
 
-  return {
-    score,
-    bands: raw.bands,
-    eatens: raw.eatens,
-    tick_id,
-    level,
-    labyrinth,
-    apple: raw.apple ?? null,
-    bug: raw.bug,
-    retryCounter,
-    isWin: raw.isWin,
-  };
+  if (!Array.isArray(s.bands) || !Array.isArray(s.bandTicks)) return 'Invalid stamp.bands';
+  if (!Array.isArray(s.apples) || !Array.isArray(s.appleTicks)) return 'Invalid stamp.apples';
+  if (!Array.isArray(s.bugs) || !Array.isArray(s.bugTicks)) return 'Invalid stamp.bugs';
+  if (!Array.isArray(s.bugTypes) || !Array.isArray(s.bugEaten)) return 'Invalid stamp.bugs';
+
+  return body as Stamp;
 }
 
-/** Кодирование JSON-значений в BLOB (UTF-8 байты) и TEXT. */
-export function encodeBlob(value: unknown): Uint8Array {
-  return new TextEncoder().encode(JSON.stringify(value));
-}
-
-export function encodeText(value: unknown): string {
+/** Кодирование массива в JSON-строку (TEXT в SQLite, массив в Postgres). */
+export function encodeArray(value: unknown): string {
   return JSON.stringify(value);
 }
 

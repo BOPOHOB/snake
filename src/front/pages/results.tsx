@@ -9,7 +9,6 @@ import {
 import { ResultCard } from '../components/results/ResultCard';
 import { useStamps, useStampsState } from '../model/stamps';
 import { useSessionState } from '../model/session';
-import { toStamp } from '../model/resultToStamp';
 import type { ResultDump } from '../types/result';
 import type { PositionResponse } from '../types/position';
 import type { Stamp } from '../types/stamp';
@@ -88,9 +87,9 @@ export const Results = () => {
     position = entry.position ?? null;
     userName = user?.name ?? null;
   } else if (loaded?.result) {
-    stamp = toStamp(loaded.result);
+    stamp = loaded.result;
     position = loaded.position;
-    userName = loaded.result.user_name || null;
+    userName = user?.name ?? null;
   } else if (id && !loaded?.result) {
     return (
       <>

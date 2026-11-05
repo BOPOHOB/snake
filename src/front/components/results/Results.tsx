@@ -2,6 +2,7 @@ import { Fragment, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BitScene } from '../elements/BitScene';
 import { assets } from '../game/assets';
+import { Game } from '../game/game';
 import type { ResultDump } from '../../types/result';
 import cn from './results.module.less';
 
@@ -42,7 +43,7 @@ const Row = ({
       return (
         <Fragment key={labyrinth}>
           <td className={current}>
-            <Link to={`/result/${result.id}`} title={result.user_name || 'Аноним'}>
+            <Link to={`/result/${result.id}`}>
               {score}
             </Link>
           </td>
@@ -71,7 +72,7 @@ const Results = ({ results, selectedId }: ResultsProps) => {
     for (const result of results) {
       if (result.labyrinth < 0 || result.labyrinth >= LABYRINTH_COUNT) continue;
       buckets[result.labyrinth].push({
-        length: result.eatens?.length ?? 0,
+        length: result.apples.length + Game.initialSnakeLength,
         score: result.score,
         level: result.level,
         retry: result.retryCounter,

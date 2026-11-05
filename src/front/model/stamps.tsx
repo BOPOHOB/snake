@@ -102,18 +102,7 @@ class Stamps {
     this.#syncing = true;
     for (const entry of pending) {
       try {
-        const res = await addResult({
-          score: entry.stamp.score,
-          bands: entry.stamp.bands,
-          eatens: entry.stamp.eatens,
-          tick_id: entry.stamp.tickId,
-          level: entry.stamp.level,
-          labyrinth: entry.stamp.labyrinth,
-          apple: entry.stamp.apple,
-          bug: entry.stamp.bug,
-          retryCounter: entry.stamp.retryCounter,
-          isWin: entry.stamp.isWin,
-        });
+        const res = await addResult(entry.stamp);
         entry.sent = true;
         entry.resultId = res.id;
         entry.position = {

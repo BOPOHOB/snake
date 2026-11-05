@@ -2,7 +2,6 @@ import { createCanvas } from 'npm:@napi-rs/canvas@0.1.55';
 import { paint } from '../../../front/components/game/paint.ts';
 import type { PaintContext, RenderFrontend } from '../../../front/components/game/paint.ts';
 import { restoreGameFromStamp } from '../../../front/components/game/restore.ts';
-import { toStamp } from '../../../front/model/resultToStamp.ts';
 import { assets } from '../../../front/components/game/assets.ts';
 import { bgColor, fgColor } from '../../../front/components/game/colors.ts';
 import type { ResultDump } from '../../../front/types/result.ts';
@@ -125,7 +124,7 @@ export function renderResultImage(result: ResultDump): Uint8Array {
     return hit;
   }
 
-  const stamp = toStamp(result);
+  const stamp = result;
   const frontend = buildFrontend(stamp);
   const length = frontend.game ? [...frontend.game.body()].length : 0;
 
@@ -156,8 +155,9 @@ export function renderResultImage(result: ResultDump): Uint8Array {
   // 3. Текстовый столбец.
   const [dateLine, timeLine] = formatTime(result.created_at ?? 0);
   const lines: string[] = [dateLine, timeLine];
-  if (result.retryCounter > 0) {
-    lines.push(`retry ${result.retryCounter}`);
+  const retryCounter = result.retryCounter ?? 0;
+  if (retryCounter > 0) {
+    lines.push(`retry ${retryCounter}`);
   }
   lines.push(`len ${length}`);
 

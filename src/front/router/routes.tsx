@@ -4,6 +4,7 @@ import { DocumentMeta } from '../router/meta';
 import { loadResults, loadResult } from '../router/loaders';
 import type { MetaContext, RouteMeta } from '../router/meta';
 import type { ResultDump } from '../types/result';
+import { Game } from '../components/game/game';
 import { Home } from '../pages/home';
 import { Results } from '../pages/results';
 import { AuthCallback } from '../pages/authCallback';
@@ -92,13 +93,13 @@ const routes: RouteObject[] = [
                 };
                 if (!r) return base;
                 return {
-                  title: `${r.user_name} — ${r.score} — Nokia 3310 Snake 2`,
-                  description: `Result: score ${r.score}, level ${r.level}, length ${r.eatens}${r.isWin ? ' — победа' : ''}.`,
+                  title: `Score ${r.score} — Nokia 3310 Snake 2`,
+                  description: `Result: score ${r.score}, level ${r.level}, length ${r.apples.length + Game.initialSnakeLength}${r.isWin ? ' — победа' : ''}.`,
                   ogUrl: id ? `https://snake3310.io/result/${id}` : undefined,
                   ogImage: id ? `https://snake3310.io/og/result/${id}.png` : undefined,
                   ogImageWidth: 1664,
                   ogImageHeight: 686,
-                  ogImageAlt: `${r.user_name} result: score ${r.score}`,
+                  ogImageAlt: `Result: score ${r.score}`,
                 };
               },
             },

@@ -1,7 +1,8 @@
-import type { AddResultBody, ResultDump } from '../types/result';
+import type { ResultDump } from '../types/result';
 import type { AddResultResponse, PositionResponse } from '../types/position';
 import type { AppUser, AuthLoginResponse } from '../types/user';
 import type { Vendor } from '../types/vendor';
+import type { Stamp } from '../types/stamp';
 
 /**
  * API-клиент. Использует относительные пути (/api/...):
@@ -75,7 +76,7 @@ export function getResultPosition(
   );
 }
 
-export function addResult(body: AddResultBody): Promise<AddResultResponse> {
+export function addResult(body: Stamp): Promise<AddResultResponse> {
   return request<AddResultResponse>('/api/result/add', {
     method: 'POST',
     body: JSON.stringify(body),
