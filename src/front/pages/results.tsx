@@ -1,9 +1,8 @@
-import { useEffect, useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import {
   useLocation,
   useNavigate,
   useParams,
-  useRevalidator,
   useRouteLoaderData,
 } from 'react-router-dom';
 import { ResultCard } from '../components/results/ResultCard';
@@ -15,7 +14,7 @@ import {
   useResultsState,
   type ResultsFocus,
 } from '../model/results';
-import { useStamps, useStampsState } from '../model/stamps';
+import { useStamps } from '../model/stamps';
 import { useSessionState } from '../model/session';
 import type { ResultDump } from '../types/result';
 import type { PositionResponse } from '../types/position';
@@ -142,10 +141,8 @@ export const Results = () => {
   const { id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const revalidator = useRevalidator();
   const stamps = useStamps();
   const { user } = useSessionState();
-  const stampsSnap = useStampsState();
 
   const resultsData = useRouteLoaderData('results') as ResultsLoaderData | undefined;
   const loaded = useRouteLoaderData('result') as ResultLoaderData | undefined;
@@ -153,6 +150,8 @@ export const Results = () => {
   const state = (location.state as LocationState | null) ?? null;
   const entry = stamps.lastEntry();
   const userName = user?.name ?? null;
+  /** Чтобы replace на /result/:id сработал один раз на resultId (без гонок/повторов). */
+  const navigatedForId = useRef<number | null>(null);
 
   const focus = resolveFocus({
     id,
@@ -163,23 +162,21 @@ export const Results = () => {
     userName,
   });
 
-  // После отправки stamp на бекенд — replace на /result/:id (карточка уже на экране).
+  // После отправки stamp на бекенд — один replace на /result/:id.
+  // Лоадеры подтянутся самим переходом; отдельный revalidate() зацикливал GET'ы.
   useEffect(() => {
     if (!state?.justFinished || entry?.resultId == null) return;
     if (id === String(entry.resultId)) return;
-    const nextId = entry.resultId;
-    const stamp = entry.stamp;
-    const position = entry.position ?? null;
-    void Promise.resolve(revalidator.revalidate()).finally(() => {
-      navigate(`/result/${nextId}`, {
-        replace: true,
-        state: {
-          justFinished: true,
-          stamp,
-          position,
-          userName,
-        },
-      });
+    if (navigatedForId.current === entry.resultId) return;
+    navigatedForId.current = entry.resultId;
+    navigate(`/result/${entry.resultId}`, {
+      replace: true,
+      state: {
+        justFinished: true,
+        stamp: entry.stamp,
+        position: entry.position ?? null,
+        userName,
+      },
     });
   }, [
     state?.justFinished,
@@ -188,16 +185,8 @@ export const Results = () => {
     entry?.position,
     id,
     navigate,
-    revalidator,
     userName,
   ]);
-
-  // После sync unsent→sent список на сервере мог измениться — перезапросить лоадер.
-  useEffect(() => {
-    if (stampsSnap.unsent === 0 && state?.justFinished) {
-      void revalidator.revalidate();
-    }
-  }, [stampsSnap.unsent, state?.justFinished, revalidator]);
 
   const focusKey = useMemo(() => {
     if (focus === 'pending') return 'pending';

@@ -83,13 +83,15 @@ const Results = ({ results, selectedId }: ResultsProps) => {
 
   const levels = useMemo(() => {
     const buckets: Entry[][] = Array.from({ length: LABYRINTH_COUNT }, () => []);
-    for (const result of results) {
+    for (const result of results ?? []) {
+      if (result == null) continue;
       if (result.labyrinth < 0 || result.labyrinth >= LABYRINTH_COUNT) continue;
+      const applesLen = Array.isArray(result.apples) ? result.apples.length : 0;
       buckets[result.labyrinth].push({
-        length: result.apples.length + Game.initialSnakeLength,
-        score: result.score,
-        level: result.level,
-        retry: result.retryCounter,
+        length: applesLen + Game.initialSnakeLength,
+        score: result.score ?? 0,
+        level: result.level ?? 0,
+        retry: result.retryCounter ?? 0,
         result,
       });
     }

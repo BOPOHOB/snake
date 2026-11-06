@@ -168,6 +168,7 @@ class ResultsModel {
     };
   }
 
+  /** Бекенд + ещё не отправленные локальные stamp'ы. */
   #mergeServerAndUnsent(server: ResultDump[]): ResultDump[] {
     const local = this.#stamps.unsentEntries().map((entry, i) =>
       localDump(entry.stamp, -i - 1, this.#userName),
@@ -188,7 +189,6 @@ class ResultsModel {
     if (focus.kind === 'stamp') {
       const hit = rows.find(
         (r) =>
-          r.id < 0 &&
           r.score === focus.stamp.score &&
           r.head === focus.stamp.head &&
           r.tick === focus.stamp.tick &&
