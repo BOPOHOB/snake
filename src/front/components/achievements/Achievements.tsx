@@ -3,6 +3,7 @@ import { BitScene } from '../elements/BitScene';
 import classNames from 'classnames';
 import cn from './achievements.module.less';
 import { achievements } from '../../services/achivements/achivements';
+import { useStampsState } from '../../model/stamps';
 
 type AchievementLike = {
   isResurrected: boolean;
@@ -41,11 +42,16 @@ const Achievement = ({ achievement }: { achievement: AchievementLike }) => {
 
 const Achievements = () => {
   // Первый кадр совпадает с SSR (без localStorage); после mount — переигровка stamp'ов.
+  const { remoteVersion } = useStampsState();
   const [, setHydrated] = useState(0);
   useEffect(() => {
     achievements.hydrateFromStorage();
     setHydrated((n) => n + 1);
   }, []);
+  // После подгрузки истории пользователя с сервера — перерисовать список.
+  useEffect(() => {
+    if (remoteVersion > 0) setHydrated((n) => n + 1);
+  }, [remoteVersion]);
 
   return (
     <ul className={cn.wrap}>

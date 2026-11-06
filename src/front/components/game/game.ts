@@ -1,7 +1,6 @@
+import type { AchievementType } from '../../services/achivements/achivement';
 import { directionPoint, isOppositeDirection, keepTorus, neighbors, objectPoint, pointObject, type Direction, type Point, type Stamp } from '../../types/stamp';
 import { assets } from './assets';
-
-export type GameAchievementEvent = 'win' | 'no bug' | 'score';
 
 class Game {
   static readonly defaultDirection: Direction = 1;
@@ -33,7 +32,7 @@ class Game {
 
   gameOver = false;
   onGameOver: Array<() => void> = [];
-  onAchievement?: (type: GameAchievementEvent, game: Game) => void;
+  onAchievement?: (type: AchievementType, game: Game) => void;
 
   stamp: Stamp;
 
@@ -349,6 +348,7 @@ class Game {
         stamp.score += (stamp.level + stamp.labyrinth * 3) * (10 + remind);
         stamp.bugEaten.push(stamp.tick - 1);
         stamp.bugCountdown = Game.bugFrequency;
+        this.onAchievement?.('ate bug', this);
       } else {
         if (remind === 0) {
           stamp.bugCountdown = Game.bugFrequency;

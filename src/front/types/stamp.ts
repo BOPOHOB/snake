@@ -52,6 +52,24 @@ const directionPoint = (d: Direction): number => [
 
 const isOppositeDirection = (a: Direction, b: Direction) => b === a - 2 || b === a + 2;
 
+function* bugIter(stamp: Pick<Stamp, 'bugTicks' | 'bugEaten' | 'bugTypes'>) {
+  const ticks = stamp.bugTicks;
+  const eaten = stamp.bugEaten;
+  const type = stamp.bugTypes;
+  let j = 0;
+  for (let i = 0; i != ticks.length; ++i) {
+    const wasEaten = j < eaten.length && (ticks[i + 1] ?? Infinity) > eaten[j];
+    yield {
+      tick: ticks[i],
+      eatenTick: wasEaten ? eaten[j] : null,
+      type: type[i]
+    };
+    if (wasEaten) {
+      ++j;
+    }
+  }
+}
+
 /** Полный слепок состояния игры (результат сериализации Game.stamp()). */
 type Stamp = {
   // Счет теперь выводим из остальной совокупности данных но алгоритм сложный, кеширование нужно
@@ -91,5 +109,6 @@ export {
   isOppositeDirection,
   neighbors,
   keepTorus,
+  bugIter,
   type Stamp
 };

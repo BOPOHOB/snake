@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { objectPoint, directionObject, directionPoint, keepTorus, pointObject, type Direction } from './stamp';
+import { objectPoint, directionObject, directionPoint, keepTorus, pointObject, type Direction, bugIter } from './stamp';
 
 /** Проверяем, что упаковка направления через объектную форму совпадает с прямой упаковкой. */
 describe('directionPoint', () => {
@@ -19,6 +19,39 @@ describe('directionPoint', () => {
     expect(directionPoint(3)).toBe(-1);
   });
 });
+
+describe('bugs iter test', () => {
+
+  it('Движение по жукам соответствует ожиданиям', () => {
+    const bugs = [...bugIter({
+      bugTicks: [1, 5, 10, 15, 22, 33, 55, 77],
+      bugEaten: [2,    11, 19, 24,     56, 78],
+      bugTypes: [1, 1,  1,  2,  2,  2,  3,  3],
+    })];
+    expect(bugs.length).toBe(8);
+    expect(bugs.at(0)).toStrictEqual({ tick:  1, eatenTick:    2, type: 1 });
+    expect(bugs.at(1)).toStrictEqual({ tick:  5, eatenTick: null, type: 1 });
+    expect(bugs.at(2)).toStrictEqual({ tick: 10, eatenTick:   11, type: 1 });
+
+    expect(bugs.at(3)).toStrictEqual({ tick: 15, eatenTick:   19, type: 2 });
+    expect(bugs.at(4)).toStrictEqual({ tick: 22, eatenTick:   24, type: 2 });
+    expect(bugs.at(5)).toStrictEqual({ tick: 33, eatenTick: null, type: 2 });
+
+    expect(bugs.at(6)).toStrictEqual({ tick: 55, eatenTick:   56, type: 3 });
+    expect(bugs.at(7)).toStrictEqual({ tick: 77, eatenTick:   78, type: 3 });
+  });
+
+  it('Проверка съедения последнего элемента', () => {
+    const bugs = [...bugIter({
+      bugTicks: [1, 5],
+      bugEaten: [2,  ],
+      bugTypes: [1, 1],
+    })];
+    expect(bugs.length).toBe(2);
+    expect(bugs.at(0)).toStrictEqual({ tick:  1, eatenTick:    2, type: 1 });
+    expect(bugs.at(1)).toStrictEqual({ tick:  5, eatenTick: null, type: 1 });
+  });
+})
 
 /** Перекрёстный заём при p-1 с x=0: упаковка (y<<10)+x даёт x=1023, y-1.
  *  pointObject должен это детектить (x > 512) и восстанавливать: x=-1, y+=1. */

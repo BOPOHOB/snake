@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useSyncExternalStore, type FC, type PropsWithChildren } from 'react';
 import type { Stamp } from '../types/stamp';
 import type { PositionResponse } from '../types/position';
-import { addResult } from '../services/api';
+import { addResult, getResults } from '../services/api';
+import { achievements } from '../services/achivements/achivements';
 import { useModel } from '../utils/useModel';
 
 const STORAGE_KEY = 'stamp';
@@ -17,6 +18,8 @@ export type StampEntry = {
 type StampsSnapshot = {
   total: number;
   unsent: number;
+  /** Увеличивается после подгрузки результатов пользователя с сервера (для ререндера ачивок). */
+  remoteVersion: number;
 };
 
 function readEntries(): StampEntry[] {
@@ -45,8 +48,10 @@ function writeEntries(entries: StampEntry[]): void {
 class Stamps {
   #entries: StampEntry[] = [];
   #listeners = new Set<() => void>();
-  #snapshot: StampsSnapshot = { total: 0, unsent: 0 };
+  #snapshot: StampsSnapshot = { total: 0, unsent: 0, remoteVersion: 0 };
   #syncing = false;
+  #remoteUserId: number | null = null;
+  #remoteLoading = false;
 
   constructor() {
     // Не читаем localStorage здесь: на клиенте constructor срабатывает
@@ -59,6 +64,30 @@ class Stamps {
     if (typeof localStorage === 'undefined') return;
     this.#entries = readEntries();
     this.#rebuild();
+  }
+
+  /**
+   * После авторизации: все результаты пользователя с бекенда →
+   * achievements.accept('finished', …) без попапов.
+   */
+  async loadRemoteForUser(userId: number): Promise<void> {
+    if (this.#remoteUserId === userId || this.#remoteLoading) return;
+    this.#remoteLoading = true;
+    try {
+      const { results } = await getResults();
+      const mine = results.filter((r) => r.user_id === userId);
+      achievements.acceptFinishedHistory(mine);
+      this.#remoteUserId = userId;
+      this.#snapshot = {
+        ...this.#snapshot,
+        remoteVersion: this.#snapshot.remoteVersion + 1,
+      };
+      this.#listeners.forEach((l) => l());
+    } catch {
+      // Повторим при следующем срабатывании эффекта.
+    } finally {
+      this.#remoteLoading = false;
+    }
   }
 
   subscribe = (cb: () => void): (() => void) => {
@@ -74,6 +103,7 @@ class Stamps {
     this.#snapshot = {
       total: this.#entries.length,
       unsent: this.#entries.filter((e) => !e.sent).length,
+      remoteVersion: this.#snapshot.remoteVersion,
     };
     this.#listeners.forEach((l) => l());
   }

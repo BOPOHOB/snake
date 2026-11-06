@@ -2,6 +2,8 @@ import { assets } from '../../components/game/assets';
 import type { Stamp } from '../../types/stamp';
 import { Achievement } from './achivement';
 import { ICONS } from './achivementsIcon';
+import { AllIsMineAchieve } from './i/allIsMine';
+import { BroccoliAgainAchieve } from './i/broccoliAgain';
 import { ExplorerAchieve } from './i/explorer';
 import { ScoreThousand } from './i/scoreThousand';
 import { ScoreThousandForAll } from './i/scoreThousandForAll';
@@ -59,6 +61,8 @@ class Achievements
       achievements.push(new ScoreThousand());
       achievements.push(new ScoreThousandForAll());
       achievements.push(new ExplorerAchieve());
+      achievements.push(new AllIsMineAchieve());
+      achievements.push(new BroccoliAgainAchieve());
       for (const [key] of Object.entries(ICONS)) {
         if (achievements.find(n => n.name === key) === undefined) {
           achievements.push(AchievePlug.create(key));
@@ -70,18 +74,36 @@ class Achievements
     }
   }
 
+  /**
+   * Пакетная переигровка stamp'ов без попапов onAchieved
+   * (история с диска / с сервера — не «новые» ачивки в этой сессии).
+   */
+  acceptFinishedHistory(stamps: Stamp[]): void {
+    const prev = this.onAchieved;
+    this.onAchieved = undefined;
+    try {
+      for (const stamp of stamps) {
+        if (stamp) this.accept('finished', stamp);
+      }
+    } finally {
+      this.onAchieved = prev;
+    }
+  }
+
   /** Переигровка stamp'ов из localStorage — только после mount (не в constructor). */
   hydrateFromStorage(): void {
     if (typeof localStorage === 'undefined') return;
     try {
       const raw = JSON.parse(localStorage.getItem('stamp') ?? '[]');
       if (!Array.isArray(raw)) return;
+      const stamps: Stamp[] = [];
       for (const item of raw) {
         const stamp = item && typeof item === 'object' && 'stamp' in item
-          ? item.stamp
-          : item;
-        if (stamp) this.accept('finished', stamp);
+          ? (item as { stamp: Stamp }).stamp
+          : (item as Stamp);
+        if (stamp) stamps.push(stamp);
       }
+      this.acceptFinishedHistory(stamps);
     } catch {
       /* ignore broken storage */
     }

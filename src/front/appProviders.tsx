@@ -42,14 +42,18 @@ const theme = {
   },
 };
 
-/** Связывает sync-очередь stamps с состоянием авторизации и появлением unsent. */
+/** Sync unsent → бекенд; после авторизации — подтянуть историю пользователя в ачивки. */
 function StampsSync() {
   const stamps = useStamps();
-  const { isAuthenticated } = useSessionState();
+  const { isAuthenticated, user } = useSessionState();
   const { unsent } = useStampsState();
   useEffect(() => {
     void stamps.sync(isAuthenticated);
   }, [stamps, isAuthenticated, unsent]);
+  useEffect(() => {
+    if (!isAuthenticated || user == null) return;
+    void stamps.loadRemoteForUser(user.id);
+  }, [stamps, isAuthenticated, user]);
   return null;
 }
 

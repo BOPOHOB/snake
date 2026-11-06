@@ -8,7 +8,7 @@ const DETAILS: Record<keyof typeof ICONS, string> = {
   "Not a beginner": 'Collect 1000 points',
   "1000 for all": 'Collect 1000 points in each labyrinth',
   'Explorer': "сыграть во всех лабиринтах",
-  'All is mine': "съесть пять букашек подряд",
+  'All is mine': "Не упустить пять букашек подряд",
   'Broccoli again': "съесть три одинаковых букашки подряд",
   'This is my favorite': "съесть пять букашек в одной игре",
   'Snake reaction': "съесть букашку со счётчиком больше 15ти",
