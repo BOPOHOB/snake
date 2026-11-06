@@ -1,0 +1,46 @@
+
+
+/* Попап ачивки: фон как везде, чёрная рамка 5px, без скруглений/отступов.
+   Слева иконка на всю высоту, справа сверху название, ниже описание. */
+:global(.ant-notification-notice).container {
+  background: @bgColor;
+  border: 5px solid @fgColor;
+  border-radius: 0;
+  font-family: 'nokia', Verdana, Tahoma;
+  padding: 8px !important;
+
+  :global(.ant-notification-notice-message) {
+    margin: 0;
+    padding: 0;
+    color: @fgColor;
+  }
+  :global(.ant-notification-notice-close) {
+    color: @fgColor;
+  }
+}
+
+.layout {
+  display: flex;
+  align-items: center;
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 0 4px;
+    min-width: 0;
+  
+  
+    h3 {
+      font-weight: bold;
+      color: @fgColor;
+      margin: 0;
+      padding: 0;
+    }
+    p {
+      color: @fgColor;
+      margin: 0;
+      padding: 0;
+    }
+  }
+}

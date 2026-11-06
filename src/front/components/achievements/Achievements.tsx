@@ -13,28 +13,28 @@ type AchievementLike = {
   progress: { all: number; now: number } | null;
 };
 
-const Achievement = ({ achivement }: { achivement: AchievementLike }) => {
-  const resurrected = achivement.isResurrected && achivement.isFinished;
+const Achievement = ({ achievement }: { achievement: AchievementLike }) => {
+  const resurrected = achievement.isResurrected && achievement.isFinished;
   return (
     <li
       className={classNames({
         [cn.resurrected]: resurrected,
-        [cn.finished]: achivement.isFinished || true,
+        [cn.finished]: achievement.isFinished,
       })}
     >
       <BitScene
         width={70}
         height={70}
         bg={resurrected ? 'white' : undefined}
-        data={achivement.icon}
+        data={achievement.icon}
       />
       <h3>
-        {achivement.name}
-        {!achivement.isFinished && achivement.progress
-          ? ` (${achivement.progress.now} / ${achivement.progress.all})`
+        {achievement.name}
+        {!achievement.isFinished && achievement.progress
+          ? ` (${achievement.progress.now} / ${achievement.progress.all})`
           : ''}
       </h3>
-      <p>{achivement.details}</p>
+      <p>{achievement.details}</p>
     </li>
   );
 };
@@ -49,8 +49,8 @@ const Achievements = () => {
 
   return (
     <ul className={cn.wrap}>
-      {[...achievements.results()].map((achivement, id) => (
-        <Achievement key={id} achivement={achivement as AchievementLike} />
+      {[...achievements.results()].map((achievement, id) => (
+        <Achievement key={id} achievement={achievement as AchievementLike} />
       ))}
     </ul>
   );

@@ -6,12 +6,17 @@ import { SessionProvider, useSessionState } from './model/session';
 import { StampsProvider, useStamps, useStampsState } from './model/stamps';
 import { bgColor, fgColor } from './components/game/colors';
 import { achievements } from './services/achivements/achivements';
+import type { Achievement } from './services/achivements/achivement';
+import { notify } from './components/achievements/notify';
 
 // Глобальная тема antd: пиксельный шрифт Nokia + ретро-кнопки (толстая чёрная рамка,
 // зелёный фон как везде на сайте, hover-инверсия в чёрный) на всех antd-кнопках проекта.
 const theme = {
   token: {
     fontFamily: "'nokia', Verdana, Tahoma",
+    borderRadius: 0,
+    colorBgElevated: bgColor,
+    colorText: fgColor,
   },
   components: {
     Button: {
@@ -26,6 +31,13 @@ const theme = {
       defaultActiveBg: fgColor,
       defaultActiveColor: bgColor,
       defaultActiveBorderColor: fgColor,
+    },
+    Notification: {
+      borderRadiusLG: 0,
+      colorBgElevated: bgColor,
+      colorText: fgColor,
+      colorIcon: fgColor,
+      colorInfo: fgColor,
     },
   },
 };
@@ -45,8 +57,8 @@ function StampsSync() {
 function AchievementsWiring() {
   const [api, contextHolder] = notification.useNotification();
 
-  const achieveMessage = useCallback(() => {
-    api.info({ message: 'я ачивка' });
+  const achieveMessage = useCallback((a: Achievement) => {
+    api.open(notify(a));
   }, [api]);
   useEffect(() => {
     if (typeof window === 'undefined') return;
