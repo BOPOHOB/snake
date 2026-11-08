@@ -68,7 +68,7 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
   return (
     <main className={onResults ? cn.mainResults : undefined}>
       <header className={cn.header}>
-        <h1>Nokia 3310 Snake 2</h1>
+        <h1><span className={cn.version}><span className={cn.nokia}>Nokia</span> 3310</span> Snake <span className={cn.version}>2</span></h1>
         <nav>
           <Menu onClick={onClick} selectedKeys={selectedKeys} mode="horizontal" items={ITEMS} />
         </nav>

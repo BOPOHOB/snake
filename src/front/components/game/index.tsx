@@ -1,7 +1,58 @@
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { bindRender } from './render';
 import type { Frontend } from './frontend';
-import cn from './game.module.less';
+import cn from './index.module.less';
+import mobile from 'is-mobile';
+import { Button } from 'antd';
+import { BitScene } from '../elements/BitScene';
+
+const rotate = (rect: number[][]) => {
+  const r = rect.length;
+  const result = new Array(r).fill(null).map(() => new Array(r));
+  for (let i = 0; i !== r; ++i) {
+    for (let j = 0; j !== r; ++j) {
+      result[j][r - 1 - i] = rect[i][j];
+    }
+  }
+  return result;
+};
+
+const RB = [
+  [0,0,0,0,0,0,0,0],
+  [0,1,0,0,0,0,0,0],
+  [0,0,1,0,0,0,0,0],
+  [0,0,0,1,0,0,1,0],
+  [0,0,0,0,1,0,1,0],
+  [0,0,0,0,0,1,1,0],
+  [0,0,0,1,1,1,1,0],
+  [0,0,0,0,0,0,0,0],
+];
+const LB = rotate(RB);
+const LT = rotate(LB);
+const RT = rotate(LT);
+
+const SIZE = 50;
+
+const R = [
+  [0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,1,0,0,0],
+  [0,0,0,0,0,0,1,0,0],
+  [0,1,1,1,1,1,1,1,0],
+  [0,0,0,0,0,0,1,0,0],
+  [0,0,0,0,0,1,0,0,0],
+  [0,0,0,0,0,0,0,0,0],
+  [0,0,0,0,0,0,0,0,0],
+];
+const B = rotate(R);
+const L = rotate(B);
+const T = rotate(L);
+
+const useUpdate = () => {
+  const [_, s] = useState(0);
+  return useCallback(() => s((v => v + 1)), []);
+};
+
 
 const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
@@ -82,7 +133,9 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
     };
   }, [frontend]);
 
-  return (
+  const isMobile = mobile();
+
+  const canvas = (
     <canvas
       className={cn.scene}
       ref={ref}
@@ -91,6 +144,58 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
       aria-label="Snake 2 game field"
       onClick={() => ref.current?.focus()}
     />
+  );
+
+  const update = useUpdate();
+
+  const nxt = () => {
+    frontend.onNextPage();
+    update();
+  };
+
+  const prw = () => {
+    frontend.onBackPage();
+    update();
+  };
+
+  if (!isMobile) {
+    return canvas;
+  }
+
+  frontend.page !== 'game';
+
+  return (
+    <div className={cn.layout}>
+    {
+      frontend.page !== 'game' ? (
+        <Button className={cn.lt} onClick={frontend.page === 'level' ? frontend.onDown : frontend.onLeft}><BitScene width={SIZE} height={SIZE} data={B} /></Button>
+      ) : (
+        <Button className={cn.lt} onClick={frontend.onLT}><BitScene width={SIZE} height={SIZE} data={LT} /></Button>
+      )
+    }
+    {
+      frontend.page !== 'game' ? (
+        <Button className={cn.lb} onClick={prw} disabled={frontend.page === 'level'}><BitScene width={SIZE} height={SIZE} data={L} /></Button>
+      ) : (
+        <Button className={cn.lb} onClick={frontend.onLB}><BitScene width={SIZE} height={SIZE} data={LB} /></Button>
+      )
+    }
+      {canvas}
+    {
+      frontend.page !== 'game' ? (
+        <Button className={cn.rt} onClick={frontend.page === 'level' ? frontend.onUp : frontend.onRight}><BitScene width={SIZE} height={SIZE} data={T} /></Button>
+      ) : (
+        <Button className={cn.rt} onClick={frontend.onRT}><BitScene width={SIZE} height={SIZE} data={RT} /></Button>
+      )
+    }
+    {
+      frontend.page !== 'game' ? (
+        <Button className={cn.rb} onClick={nxt}><BitScene width={SIZE} height={SIZE} data={R} /></Button>
+      ) : (
+        <Button className={cn.rb} onClick={frontend.onRB}><BitScene width={SIZE} height={SIZE} data={RB} /></Button>
+      )
+    }
+    </div>
   );
 };
 

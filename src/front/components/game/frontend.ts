@@ -2,6 +2,7 @@ import { Game } from './game';
 import { assets } from './assets';
 import { achievements } from '../../services/achivements/achivements.ts';
 import { keepTorus, objectPoint, type Point } from '../../types/stamp';
+import { ScreenOrientation } from '@capacitor/screen-orientation';
 
 class Frontend {
   game: Game | null = null;
@@ -31,6 +32,7 @@ class Frontend {
   }
 
   startGame(): void {
+    ScreenOrientation.lock({ orientation: 'landscape' });
     this.attachGame(new Game(this.level, this.labyrinth));
     achievements.accept('started', this.game!.stamp);
     this.onResume(0);
@@ -49,13 +51,14 @@ class Frontend {
 
   onGameOver(callback: (game: Game) => void): () => void {
     this.#onGameOver.push(callback);
+    ScreenOrientation.unlock();
     return () => {
       const i = this.#onGameOver.indexOf(callback);
       if (i >= 0) this.#onGameOver.splice(i, 1);
     };
   }
 
-  onNextPage(): void {
+  onNextPage = (): void => {
     switch (this.page) {
       case 'level':
         if (this.interval) clearInterval(this.interval);
@@ -104,7 +107,7 @@ class Frontend {
     this.update?.();
   }
 
-  onBackPage(): void {
+  onBackPage = (): void => {
     switch (this.page) {
       case 'labyrinth':
         this.page = 'level';
@@ -116,7 +119,7 @@ class Frontend {
     }
   }
 
-  onUp(): void {
+  onUp = (): void => {
     switch (this.page) {
       case 'level':
         if (this.level < Game.tickDurations.length - 1) {
@@ -139,7 +142,7 @@ class Frontend {
     }
   }
 
-  onDown(): void {
+  onDown = (): void => {
     switch (this.page) {
       case 'level':
         if (this.level > 1) {
@@ -162,7 +165,7 @@ class Frontend {
     }
   }
 
-  onLeft(): void {
+  onLeft = (): void => {
     switch (this.page) {
       case 'level':
         if (this.level > 1) {
@@ -185,7 +188,7 @@ class Frontend {
     }
   }
 
-  onRight(): void {
+  onRight = (): void => {
     switch (this.page) {
       case 'level':
         if (this.level < Game.tickDurations.length - 1) {
@@ -206,6 +209,20 @@ class Frontend {
       default:
         console.error('unknown page', this.page);
     }
+  }
+
+  onLT = () => {
+    console.log(this.game?.direction);
+    (this.game!.direction() % 2 === 1 ? this.onUp : this.onLeft)();
+  }
+  onLB = () => {
+    (this.game!.direction() % 2 === 1 ? this.onDown : this.onLeft)();
+  }
+  onRT = () => {
+    (this.game!.direction() % 2 === 1 ? this.onUp : this.onRight)();
+  }
+  onRB = () => {
+    (this.game!.direction() % 2 === 1 ? this.onDown : this.onRight)();
   }
 }
 

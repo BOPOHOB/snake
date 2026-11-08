@@ -12,9 +12,26 @@
   flex-shrink: 0;
   align-items: center;
   gap: 50px;
+  @media (max-width: 1000px) {
+    & {
+      gap: 10px;
+      font-size: 80%;
+    }
+  }
   h1 {
     margin: 0px;
     margin-left: 40px;
+    white-space: no-wrap;
+    @media (max-width: 1000px) {
+      .nokia {
+        display: none;
+      }
+    }
+    @media (max-width: 876px) {
+      .version {
+        display: none;
+      }
+    }
   }
   nav {
     margin-top: 6px;

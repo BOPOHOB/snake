@@ -1,0 +1,45 @@
+
+.scene {
+  outline: 0px solid transparent;
+  cursor: auto;
+  width: 100vw;
+  height: calc(100vh - 50px);
+}
+
+.layout {
+  display: grid;
+
+  grid-template-columns: 100px auto 100px;
+
+  grid-template-areas: 
+    "lt canvas rt"
+    "lb canvas rb";
+    
+  justify-items: stretch;
+
+  >canvas.scene {
+    grid-area: canvas;
+    width: calc(100vw - 200px);
+  }
+
+  >button {
+    height: unset;
+
+    &:active, &:hover {
+      background: #73a582 !important;
+    }
+  }
+
+  .lt {
+    grid-area: lt;
+  }
+  .lb {
+    grid-area: lb;
+  }
+  .rt {
+    grid-area: rt;
+  }
+  .rb {
+    grid-area: rb;
+  }
+}
