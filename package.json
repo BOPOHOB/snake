@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.5.2",
-    "@capacitor/screen-orientation": "^8.0.2",
     "antd": "^5.22.0",
     "classnames": "^2.5.1",
     "is-mobile": "^5.0.0",

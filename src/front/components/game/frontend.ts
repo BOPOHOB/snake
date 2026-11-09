@@ -2,7 +2,6 @@ import { Game } from './game';
 import { assets } from './assets';
 import { achievements } from '../../services/achivements/achivements.ts';
 import { keepTorus, objectPoint, type Point } from '../../types/stamp';
-import { ScreenOrientation } from '@capacitor/screen-orientation';
 
 class Frontend {
   game: Game | null = null;
@@ -32,7 +31,6 @@ class Frontend {
   }
 
   startGame(): void {
-    ScreenOrientation.lock({ orientation: 'landscape' });
     this.attachGame(new Game(this.level, this.labyrinth));
     achievements.accept('started', this.game!.stamp);
     this.onResume(0);
@@ -51,7 +49,6 @@ class Frontend {
 
   onGameOver(callback: (game: Game) => void): () => void {
     this.#onGameOver.push(callback);
-    ScreenOrientation.unlock();
     return () => {
       const i = this.#onGameOver.indexOf(callback);
       if (i >= 0) this.#onGameOver.splice(i, 1);
@@ -82,7 +79,7 @@ class Frontend {
     return this.interval === null;
   }
 
-  onPause(): void {
+  onPause = (): void => {
     if (this.page !== 'game') {
       return;
     }
@@ -91,7 +88,7 @@ class Frontend {
     this.update?.();
   }
 
-  onResume(delay = 3): void {
+  onResume = (delay = 3): void => {
     if (this.page !== 'game' || this.game === null) {
       return;
     }

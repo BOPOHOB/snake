@@ -10,10 +10,16 @@
   display: grid;
 
   grid-template-columns: 100px auto 100px;
+  grid-template-rows: 50% calc(50% - 32px) 32px;
+
+  .scene {
+    height: calc(100vh - 50px - 32px);
+  }
 
   grid-template-areas: 
     "lt canvas rt"
-    "lb canvas rb";
+    "lb canvas rb"
+    "lb pause rb";
     
   justify-items: stretch;
 
@@ -22,12 +28,16 @@
     width: calc(100vw - 200px);
   }
 
-  >button {
+  .lt, .lb, .rt, .rb {
     height: unset;
 
     &:active, &:hover {
       background: #73a582 !important;
     }
+  }
+
+  .pause {
+    grid-area: pause;
   }
 
   .lt {

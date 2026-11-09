@@ -158,6 +158,11 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
     update();
   };
 
+  const pause = () => {
+    (frontend.isPaused() ? frontend.onResume as (() => void) : frontend.onPause)();
+    update();
+  }
+
   if (!isMobile) {
     return canvas;
   }
@@ -166,35 +171,36 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
 
   return (
     <div className={cn.layout}>
-    {
-      frontend.page !== 'game' ? (
-        <Button className={cn.lt} onClick={frontend.page === 'level' ? frontend.onDown : frontend.onLeft}><BitScene width={SIZE} height={SIZE} data={B} /></Button>
-      ) : (
-        <Button className={cn.lt} onClick={frontend.onLT}><BitScene width={SIZE} height={SIZE} data={LT} /></Button>
-      )
-    }
-    {
-      frontend.page !== 'game' ? (
-        <Button className={cn.lb} onClick={prw} disabled={frontend.page === 'level'}><BitScene width={SIZE} height={SIZE} data={L} /></Button>
-      ) : (
-        <Button className={cn.lb} onClick={frontend.onLB}><BitScene width={SIZE} height={SIZE} data={LB} /></Button>
-      )
-    }
+      {
+        frontend.page !== 'game' ? (
+          <Button className={cn.lt} onClick={frontend.page === 'level' ? frontend.onDown : frontend.onLeft}><BitScene width={SIZE} height={SIZE} data={B} /></Button>
+        ) : (
+          <Button className={cn.lt} onClick={frontend.onLT}><BitScene width={SIZE} height={SIZE} data={LT} /></Button>
+        )
+      }
+      {
+        frontend.page !== 'game' ? (
+          <Button className={cn.lb} onClick={prw} disabled={frontend.page === 'level'}><BitScene width={SIZE} height={SIZE} data={L} /></Button>
+        ) : (
+          <Button className={cn.lb} onClick={frontend.onLB}><BitScene width={SIZE} height={SIZE} data={LB} /></Button>
+        )
+      }
       {canvas}
-    {
-      frontend.page !== 'game' ? (
-        <Button className={cn.rt} onClick={frontend.page === 'level' ? frontend.onUp : frontend.onRight}><BitScene width={SIZE} height={SIZE} data={T} /></Button>
-      ) : (
-        <Button className={cn.rt} onClick={frontend.onRT}><BitScene width={SIZE} height={SIZE} data={RT} /></Button>
-      )
-    }
-    {
-      frontend.page !== 'game' ? (
-        <Button className={cn.rb} onClick={nxt}><BitScene width={SIZE} height={SIZE} data={R} /></Button>
-      ) : (
-        <Button className={cn.rb} onClick={frontend.onRB}><BitScene width={SIZE} height={SIZE} data={RB} /></Button>
-      )
-    }
+      <Button disabled={frontend.page !== 'game'} className={cn.pause} onClick={pause}>{frontend.isPaused() ? 'Resume' : 'Pause'}</Button>
+      {
+        frontend.page !== 'game' ? (
+          <Button className={cn.rt} onClick={frontend.page === 'level' ? frontend.onUp : frontend.onRight}><BitScene width={SIZE} height={SIZE} data={T} /></Button>
+        ) : (
+          <Button className={cn.rt} onClick={frontend.onRT}><BitScene width={SIZE} height={SIZE} data={RT} /></Button>
+        )
+      }
+      {
+        frontend.page !== 'game' ? (
+          <Button className={cn.rb} onClick={nxt}><BitScene width={SIZE} height={SIZE} data={R} /></Button>
+        ) : (
+          <Button className={cn.rb} onClick={frontend.onRB}><BitScene width={SIZE} height={SIZE} data={RB} /></Button>
+        )
+      }
     </div>
   );
 };
