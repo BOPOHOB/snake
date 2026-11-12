@@ -72,62 +72,60 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
     const onBlur = () => {
       frontend.onPause();
     };
-    const onKeyDown = ({ key }: KeyboardEvent) => {
-      switch (key.toLowerCase()) {
-        case 'arrowleft':
-        case 'd':
+    const onKeyDown = (e: KeyboardEvent) => {
+      // `code` = physical key (layout-independent); `key` follows layout (p→з on RU).
+      if (e.repeat) return;
+
+      const togglePause = () => {
+        if (frontend.isPaused()) frontend.onResume();
+        else frontend.onPause();
+      };
+
+      switch (e.code) {
+        case 'ArrowLeft':
+        case 'KeyA':
           frontend.onLeft();
-          return;
-        case 'arrowright':
-        case 'a':
+          break;
+        case 'ArrowRight':
+        case 'KeyD':
           frontend.onRight();
-          return;
-        case 'arrowup':
-        case 'w':
+          break;
+        case 'ArrowUp':
+        case 'KeyW':
           frontend.onUp();
-          return;
-        case 'arrowdown':
-        case 's':
+          break;
+        case 'ArrowDown':
+        case 'KeyS':
           frontend.onDown();
-          return;
-        case 'enter':
-        case ' ':
-          if (frontend.page !== 'game') {
-            frontend.onNextPage();
-            return;
-          }
-          if (frontend.isPaused()) {
-            frontend.onResume();
-          } else {
-            frontend.onPause();
-          }
-          return;
-        case 'p':
-          if (frontend.isPaused()) {
-            frontend.onResume();
-          } else {
-            frontend.onPause();
-          }
-          return;
-        case 'backspace':
-        case 'escape':
+          break;
+        case 'Enter':
+        case 'Space':
+          if (frontend.page !== 'game') frontend.onNextPage();
+          else togglePause();
+          break;
+        case 'KeyP':
+          togglePause();
+          break;
+        case 'Backspace':
+        case 'Escape':
           frontend.onBackPage();
-          return;
+          break;
         default:
           return;
       }
+      e.preventDefault();
     };
 
     window.addEventListener('resize', onResize, true);
+    window.addEventListener('keydown', onKeyDown);
     canvas.addEventListener('blur', onBlur);
-    canvas.addEventListener('keydown', onKeyDown);
     canvas.focus();
     render.current();
 
     return () => {
       window.removeEventListener('resize', onResize, true);
+      window.removeEventListener('keydown', onKeyDown);
       canvas.removeEventListener('blur', onBlur);
-      canvas.removeEventListener('keydown', onKeyDown);
       if (frontend.update === render.current) {
         frontend.update = undefined;
       }
@@ -190,8 +188,6 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
   if (!isMobile) {
     return canvas;
   }
-
-  frontend.page !== 'game';
 
   return (
     <div className={cn.layout}>
