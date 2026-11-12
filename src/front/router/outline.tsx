@@ -91,7 +91,7 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
       <header className={clsx(cn.header, !showNav && cn.hide)}>
         <h1><span className={cn.version}><span className={cn.nokia}>Nokia</span> 3310</span> Snake <span className={cn.version}>2</span></h1>
         <nav>
-          <Menu onClick={onClick} selectedKeys={selectedKeys} mode="horizontal" items={items} />
+          <Menu onClick={onClick} selectedKeys={selectedKeys} mode="horizontal" items={items} disabledOverflow />
         </nav>
         <AuthPanel />
       </header>
