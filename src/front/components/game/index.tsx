@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { bindRender } from './render';
+import { hitLabyrinthAt } from './paint';
 import type { Frontend } from './frontend';
 import cn from './index.module.less';
 import { Button } from 'antd';
@@ -138,6 +139,19 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
 
   const menuContext =  useMenuContext();
 
+  const onCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
+    const canvas = ref.current;
+    canvas?.focus();
+    if (!canvas || frontend.page !== 'labyrinth') return;
+    const lab = hitLabyrinthAt(
+      canvas.width,
+      canvas.height,
+      e.nativeEvent.offsetX,
+      e.nativeEvent.offsetY,
+    );
+    if (lab != null) frontend.setLabyrinth(lab);
+  };
+
   const canvas = (
     <canvas
       className={cn.scene}
@@ -145,7 +159,7 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
       tabIndex={0}
       role="img"
       aria-label="Snake 2 game field"
-      onClick={() => ref.current?.focus()}
+      onClick={onCanvasClick}
     />
   );
 

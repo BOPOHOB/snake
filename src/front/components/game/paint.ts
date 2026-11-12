@@ -84,6 +84,29 @@ const drawRect = (ctx: PaintContext, [w, h]: PointObject, paintRect: PointObject
   ctx.scale(scale, scale);
 };
 
+/** Клики по экрану выбора лабиринта → индекс лабиринта или null. */
+function hitLabyrinthAt(w: number, h: number, x: number, y: number): number | null {
+  const fieldSize = pointObject(assets.labyrinthSizes.at(0)!);
+  const paintRect: PointObject = [
+    fieldSize[0] * 4 + borderWidth * 2,
+    fieldSize[1] * 4 + borderWidth * 2 + headHeight,
+  ];
+  const scale = Math.min(w / paintRect[0], h / paintRect[1]);
+  const ox = (w - paintRect[0] * scale) / 2;
+  const oy = (h - paintRect[1] * scale) / 2;
+  const fx = (x - ox) / scale - borderWidth;
+  const fy = (y - oy) / scale - headHeight - borderWidth;
+  const cellW = (fieldSize[0] * 4) / 3;
+  const cellH = (fieldSize[1] * 4) / 3;
+  if (fx < 0 || fy < 0) return null;
+  const col = Math.floor(fx / cellW);
+  const row = Math.floor(fy / cellH);
+  if (col < 0 || col > 2 || row < 0 || row > 1) return null;
+  const lab = row * 3 + col;
+  if (lab < 0 || lab >= assets.labyrinth.length) return null;
+  return lab;
+}
+
 /**
  * Чистая рисовка игрового кадра в любой 2D-контекст (браузерный canvas
  * или серверный @napi-rs/canvas). Не зависит от DOM — изоморфна.
@@ -276,4 +299,4 @@ function paint(
   }
 }
 
-export { paint };
+export { paint, hitLabyrinthAt };

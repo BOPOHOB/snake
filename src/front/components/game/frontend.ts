@@ -30,6 +30,13 @@ class Frontend {
     }, Game.tickDurations[this.level]);
   }
 
+  setLabyrinth = (value: number): void => {
+    if (value < 0 || value >= assets.labyrinth.length) return;
+    this.labyrinth = value;
+    localStorage.setItem('labyrinth', String(value));
+    this.update?.();
+  };
+
   startGame(): void {
     this.attachGame(new Game(this.level, this.labyrinth));
     achievements.accept('started', this.game!.stamp);
@@ -125,11 +132,7 @@ class Frontend {
         this.update?.();
         return;
       case 'labyrinth':
-        if (this.labyrinth > 2) {
-          this.labyrinth -= 3;
-          localStorage.setItem('labyrinth', String(this.labyrinth));
-        }
-        this.update?.();
+        this.setLabyrinth(this.labyrinth - 3);
         return;
       case 'game':
         this.game?.top();
@@ -148,11 +151,7 @@ class Frontend {
         this.update?.();
         return;
       case 'labyrinth':
-        if (this.labyrinth < assets.labyrinth.length - 3) {
-          this.labyrinth += 3;
-          localStorage.setItem('labyrinth', String(this.labyrinth));
-        }
-        this.update?.();
+        this.setLabyrinth(this.labyrinth + 3);
         return;
       case 'game':
         this.game?.bottom();
@@ -171,11 +170,7 @@ class Frontend {
         this.update?.();
         return;
       case 'labyrinth':
-        if (this.labyrinth > 0) {
-          this.labyrinth -= 1;
-          localStorage.setItem('labyrinth', String(this.labyrinth));
-        }
-        this.update?.();
+        this.setLabyrinth(this.labyrinth - 1);
         return;
       case 'game':
         this.game?.left();
@@ -194,11 +189,7 @@ class Frontend {
         this.update?.();
         return;
       case 'labyrinth':
-        if (this.labyrinth < assets.labyrinth.length - 1) {
-          this.labyrinth += 1;
-          localStorage.setItem('labyrinth', String(this.labyrinth));
-        }
-        this.update?.();
+        this.setLabyrinth(this.labyrinth + 1);
         return;
       case 'game':
         this.game?.right();
