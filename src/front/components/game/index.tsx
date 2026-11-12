@@ -6,7 +6,7 @@ import cn from './index.module.less';
 import { Button } from 'antd';
 import { BitScene } from '../elements/BitScene';
 import { useMobile } from '../../utils/useMobile';
-import { useMenuContext } from '../../router/outline';
+import { useSetImmersive } from '../../router/outline';
 
 const rotate = (rect: number[][]) => {
   const r = rect.length;
@@ -59,6 +59,9 @@ const useUpdate = () => {
 const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
   const render = useRef<(() => void) | null>(null);
+  const isMobile = useMobile();
+  const setImmersive = useSetImmersive();
+  const update = useUpdate();
 
   useEffect(() => {
     const canvas = ref.current;
@@ -114,6 +117,8 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
           return;
       }
       e.preventDefault();
+      // page/pause live on Frontend; bump React so immersive + mobile chrome re-read them
+      update();
     };
 
     window.addEventListener('resize', onResize, true);
@@ -131,11 +136,12 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
       }
       render.current = null;
     };
-  }, [frontend]);
+  }, [frontend, update]);
 
-  const isMobile = useMobile();
-
-  const menuContext =  useMenuContext();
+  useEffect(() => {
+    setImmersive(frontend.page === 'game');
+    return () => setImmersive(false);
+  }, [frontend.page, setImmersive]);
 
   const onCanvasClick = (e: MouseEvent<HTMLCanvasElement>) => {
     const canvas = ref.current;
@@ -160,15 +166,6 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
       onClick={onCanvasClick}
     />
   );
-
-  const update = useUpdate();
-
-  useEffect(() => {
-    if (isMobile) {
-      menuContext?.showNav(frontend.page !== 'game');
-    }
-    return () => menuContext?.showNav(true);
-  }, [frontend.page]);
 
   const nxt = () => {
     frontend.onNextPage();

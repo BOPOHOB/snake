@@ -59,20 +59,19 @@ const AuthPanel: FC = () => {
   );
 };
 
-const MENU_CONTEXT = createContext<null | { showNav: ((v: boolean) => void) }>(null);
+/** Child reports immersive intent; Outline decides whether chrome hides (mobile only). */
+const SetImmersiveContext = createContext<(v: boolean) => void>(() => {});
 
-const useMenuContext = () => useContext(MENU_CONTEXT);
+const useSetImmersive = () => useContext(SetImmersiveContext);
 
 const Outline: FC<PropsWithChildren> = ({ children }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [showNav, setShowNav] = useState(true);
-
-  const menuContext = useMemo(() => ({
-    showNav: setShowNav
-  }), [])
+  const isMobile = useMobile();
+  const [immersive, setImmersive] = useState(false);
 
   const onResults = pathname === '/result' || pathname.startsWith('/result/');
+  const hideNav = immersive && isMobile;
 
   const onClick: MenuClickEventHandler = useCallback(({ key }) => {
     navigate(key === '' ? '/' : `/${key}`);
@@ -88,18 +87,18 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <main className={onResults ? cn.mainResults : undefined}>
-      <header className={clsx(cn.header, !showNav && cn.hide)}>
+      <header className={clsx(cn.header, hideNav && cn.hide)}>
         <h1><span className={cn.version}><span className={cn.nokia}>Nokia</span> 3310</span> Snake <span className={cn.version}>2</span></h1>
         <nav>
           <Menu onClick={onClick} selectedKeys={selectedKeys} mode="horizontal" items={items} disabledOverflow />
         </nav>
         <AuthPanel />
       </header>
-      <MENU_CONTEXT.Provider value={menuContext}>
+      <SetImmersiveContext.Provider value={setImmersive}>
         {children}
-      </MENU_CONTEXT.Provider>
+      </SetImmersiveContext.Provider>
     </main>
   );
 };
 
-export { Outline, useMenuContext };
+export { Outline, useSetImmersive };
