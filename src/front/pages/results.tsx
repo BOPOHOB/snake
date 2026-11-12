@@ -21,6 +21,7 @@ import type { PositionResponse } from '../types/position';
 import type { Stamp } from '../types/stamp';
 
 import cn from './results.module.less';
+import { useMobile } from '../utils/useMobile';
 
 type ResultsLoaderData = {
   results: ResultDump[] | null;
@@ -122,12 +123,18 @@ const ResultsBody = () => {
     );
   }
 
+  const isMobile = useMobile();
+
   return (
     <>
-      <ResultsTable results={snap.rows} selectedId={snap.selectedId} />
+      {!isMobile && (
+        <ResultsTable results={snap.rows} selectedId={snap.selectedId} />
+      )}
       <div className={cn.content}>
         {card}
-        <Achievements />
+        {!isMobile || !card && (
+          <Achievements />
+        )}
       </div>
     </>
   );

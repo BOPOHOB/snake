@@ -2,9 +2,10 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { bindRender } from './render';
 import type { Frontend } from './frontend';
 import cn from './index.module.less';
-import mobile from 'is-mobile';
 import { Button } from 'antd';
 import { BitScene } from '../elements/BitScene';
+import { useMobile } from '../../utils/useMobile';
+import { useMenuContext } from '../../router/outline';
 
 const rotate = (rect: number[][]) => {
   const r = rect.length;
@@ -133,7 +134,9 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
     };
   }, [frontend]);
 
-  const isMobile = mobile();
+  const isMobile = useMobile();
+
+  const menuContext =  useMenuContext();
 
   const canvas = (
     <canvas
@@ -147,6 +150,13 @@ const GameCanvas = ({ frontend }: { frontend: Frontend }) => {
   );
 
   const update = useUpdate();
+
+  useEffect(() => {
+    if (isMobile) {
+      menuContext?.showNav(frontend.page !== 'game');
+    }
+    return () => menuContext?.showNav(true);
+  }, [frontend.page]);
 
   const nxt = () => {
     frontend.onNextPage();

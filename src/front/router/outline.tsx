@@ -1,11 +1,13 @@
 import type { MenuProps } from 'antd';
 import { Button, Menu } from 'antd';
 import type { MenuClickEventHandler } from 'rc-menu/lib/interface';
-import { useCallback, useMemo, type FC, type PropsWithChildren } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type FC, type PropsWithChildren } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSession, useSessionState } from '../model/session';
+import clsx from 'clsx';
 
 import cn from './outline.module.less';
+import { useMobile } from '../utils/useMobile';
 
 type MenuItem = Required<MenuProps>['items'][number];
 
@@ -19,6 +21,14 @@ const ITEMS: MenuItem[] = [
     key: 'result',
   },
 ];
+
+const useItems = (key: string) => {
+  const isMobile = useMobile();
+  if (!isMobile) {
+    return ITEMS;
+  }
+  return ITEMS.filter((i) => i!.key !== key);
+};
 
 const AuthPanel: FC = () => {
   const session = useSession();
@@ -49,9 +59,18 @@ const AuthPanel: FC = () => {
   );
 };
 
+const MENU_CONTEXT = createContext<null | { showNav: ((v: boolean) => void) }>(null);
+
+const useMenuContext = () => useContext(MENU_CONTEXT);
+
 const Outline: FC<PropsWithChildren> = ({ children }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [showNav, setShowNav] = useState(true);
+
+  const menuContext = useMemo(() => ({
+    showNav: setShowNav
+  }), [])
 
   const onResults = pathname === '/result' || pathname.startsWith('/result/');
 
@@ -65,18 +84,22 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
     return [];
   }, [pathname, onResults]);
 
+  const items = useItems(selectedKeys.at(0) ?? '');
+
   return (
     <main className={onResults ? cn.mainResults : undefined}>
-      <header className={cn.header}>
+      <header className={clsx(cn.header, !showNav && cn.hide)}>
         <h1><span className={cn.version}><span className={cn.nokia}>Nokia</span> 3310</span> Snake <span className={cn.version}>2</span></h1>
         <nav>
-          <Menu onClick={onClick} selectedKeys={selectedKeys} mode="horizontal" items={ITEMS} />
+          <Menu onClick={onClick} selectedKeys={selectedKeys} mode="horizontal" items={items} />
         </nav>
         <AuthPanel />
       </header>
-      {children}
+      <MENU_CONTEXT.Provider value={menuContext}>
+        {children}
+      </MENU_CONTEXT.Provider>
     </main>
   );
 };
 
-export { Outline };
+export { Outline, useMenuContext };
