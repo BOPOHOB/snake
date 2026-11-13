@@ -4,5 +4,12 @@
   min-height: 0;
   overflow: hidden;
   margin: 0px 0px 0px 20px;
-  gap: 20px
+  gap: 20px;
+
+  /* Mobile: page content scrolls (card / list). Desktop: only Achievements scrolls. */
+  &.scroll {
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }

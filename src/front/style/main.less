@@ -7,9 +7,20 @@ html,
 body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background-color: @bgColor;
   font-family: nokia, Verdana, Tahoma;
+}
+
+/* Pin to the visual viewport so mobile URL-bar show/hide doesn't shift layout. */
+#root {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 h1,

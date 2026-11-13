@@ -20,6 +20,7 @@ import type { ResultDump } from '../types/result';
 import type { PositionResponse } from '../types/position';
 import type { Stamp } from '../types/stamp';
 
+import clsx from 'clsx';
 import cn from './results.module.less';
 import { useMobile } from '../utils/useMobile';
 
@@ -130,7 +131,7 @@ const ResultsBody = () => {
       {!isMobile && (
         <ResultsTable results={snap.rows} selectedId={snap.selectedId} />
       )}
-      <div className={cn.content}>
+      <div className={clsx(cn.content, isMobile && cn.scroll)}>
         {card}
         {!isMobile || !card && (
           <Achievements />

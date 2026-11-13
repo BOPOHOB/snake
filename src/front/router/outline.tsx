@@ -1,7 +1,7 @@
 import type { MenuProps } from 'antd';
 import { Button, Menu } from 'antd';
 import type { MenuClickEventHandler } from 'rc-menu/lib/interface';
-import { createContext, useCallback, useContext, useMemo, useState, type FC, type PropsWithChildren } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type FC, type PropsWithChildren } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSession, useSessionState } from '../model/session';
 import clsx from 'clsx';
@@ -70,23 +70,30 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
   const isMobile = useMobile();
   const [immersive, setImmersive] = useState(false);
 
+  const onHome = pathname === '/';
   const onResults = pathname === '/result' || pathname.startsWith('/result/');
-  const hideNav = immersive && isMobile;
+  // Never keep chrome hidden off the game route (stale immersive after game-over on real devices).
+  const hideNav = immersive && isMobile && onHome;
+
+  useEffect(() => {
+    if (!onHome) setImmersive(false);
+    window.scrollTo(0, 0);
+  }, [onHome, pathname]);
 
   const onClick: MenuClickEventHandler = useCallback(({ key }) => {
     navigate(key === '' ? '/' : `/${key}`);
   }, [navigate]);
 
   const selectedKeys = useMemo(() => {
-    if (pathname === '/') return [''];
+    if (onHome) return [''];
     if (onResults) return ['result'];
     return [];
-  }, [pathname, onResults]);
+  }, [onHome, onResults]);
 
   const items = useItems(selectedKeys.at(0) ?? '');
 
   return (
-    <main className={onResults ? cn.mainResults : undefined}>
+    <main className={cn.root}>
       <header className={clsx(cn.header, hideNav && cn.hide)}>
         <h1><span className={cn.version}><span className={cn.nokia}>Nokia</span> 3310</span> Snake <span className={cn.version}>2</span></h1>
         <nav>
@@ -94,9 +101,12 @@ const Outline: FC<PropsWithChildren> = ({ children }) => {
         </nav>
         <AuthPanel />
       </header>
-      <SetImmersiveContext.Provider value={setImmersive}>
-        {children}
-      </SetImmersiveContext.Provider>
+      {/* Explicit flex slot below header — Provider/fragments don't create a box. */}
+      <div className={cn.body}>
+        <SetImmersiveContext.Provider value={setImmersive}>
+          {children}
+        </SetImmersiveContext.Provider>
+      </div>
     </main>
   );
 };
